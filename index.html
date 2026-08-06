@@ -12,9 +12,13 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="styles.css?v=6">
 </head>
 <body>
+  <div class="loader" id="loader" aria-hidden="true">
+    <span class="loader-mask"><span class="loader-word">Softlab<sup>®</sup></span></span>
+  </div>
+
   <a class="skip-link" href="#obsah">Přeskočit na obsah</a>
 
   <header class="nav" id="nav">
@@ -23,6 +27,7 @@
       <nav class="nav-links" aria-label="Hlavní navigace">
         <a href="#sluzby">Služby</a>
         <a href="#projekty">Projekty</a>
+        <a href="#hriste">Hřiště</a>
         <a href="#postup">Postup</a>
         <a href="#kontakt">Kontakt</a>
       </nav>
@@ -37,6 +42,7 @@
     <nav aria-label="Mobilní navigace">
       <a href="#sluzby">Služby</a>
       <a href="#projekty">Projekty</a>
+      <a href="#hriste">Hřiště</a>
       <a href="#postup">Postup</a>
       <a href="#kontakt">Kontakt</a>
       <a class="mobile-menu-cta u-link" href="#kontakt">Poptat projekt</a>
@@ -46,11 +52,14 @@
   <main id="obsah" tabindex="-1">
     <!-- ═══ HERO ═══ -->
     <section class="hero">
+      <svg class="hero-line-art" viewBox="0 0 1440 900" preserveAspectRatio="none" aria-hidden="true">
+        <path class="hero-path" pathLength="1" d="M0 690 H430 V520 H900 V640 H1440" fill="none" vector-effect="non-scaling-stroke"/>
+      </svg>
       <div class="container hero-inner">
         <h1 class="hero-title">
-          <span class="line"><span class="line-inner">Weby &amp;</span></span>
+          <span class="line line-indent"><span class="line-inner">Weby &amp;</span></span>
           <span class="line"><span class="line-inner">interní systémy</span></span>
-          <span class="line"><span class="line-inner hero-accent">na míru.</span></span>
+          <span class="line line-right"><span class="line-inner hero-accent">na míru.</span></span>
         </h1>
         <div class="hero-foot">
           <p class="hero-sub">Jsme Softlab. Firmám stavíme rychlé weby a software, který kopíruje jejich procesy, ne naopak.</p>
@@ -66,55 +75,91 @@
       </div>
     </section>
 
-    <!-- ═══ SLUŽBY ═══ -->
+    <!-- ═══ VELOCITY PÁS ═══ -->
+    <div class="velocity" aria-hidden="true">
+      <div class="velocity-track" id="velocityTrack">
+        <div class="velocity-group">
+          <span class="vw">Weby</span>
+          <span class="vw vw-outline">E-shopy</span>
+          <span class="vw">Systémy</span>
+          <span class="vw vw-outline">Automatizace</span>
+          <span class="vw">Podpora</span>
+        </div>
+        <div class="velocity-group">
+          <span class="vw">Weby</span>
+          <span class="vw vw-outline">E-shopy</span>
+          <span class="vw">Systémy</span>
+          <span class="vw vw-outline">Automatizace</span>
+          <span class="vw">Podpora</span>
+        </div>
+        <div class="velocity-group">
+          <span class="vw">Weby</span>
+          <span class="vw vw-outline">E-shopy</span>
+          <span class="vw">Systémy</span>
+          <span class="vw vw-outline">Automatizace</span>
+          <span class="vw">Podpora</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ SLUŽBY (sticky stack) ═══ -->
     <section class="services" id="sluzby">
       <div class="container">
-        <h2 class="section-title" data-reveal>Co stavíme</h2>
+        <h2 class="section-title mask-title" data-reveal><span class="mt-inner">Co stavíme</span></h2>
       </div>
-      <ul class="svc-list">
-        <li class="svc-row" data-reveal>
-          <div class="container svc-inner">
+      <ul class="stack container">
+        <li class="stack-card">
+          <div class="stack-text">
             <h3>Weby</h3>
-            <p>Prezentace a kampaně, které prodávají.</p>
+            <p>Prezentace a kampaně, které prodávají. Od návrhu po nasazení, rychlé a měřitelné od prvního dne.</p>
+            <p class="stack-tags">UX a design / Copy / Vývoj / SEO základ / Analytika</p>
           </div>
+          <div class="stack-art" data-art="paragraphs" data-seed="9" aria-hidden="true"></div>
         </li>
-        <li class="svc-row" data-reveal>
-          <div class="container svc-inner">
+        <li class="stack-card">
+          <div class="stack-text">
             <h3>E-shopy</h3>
-            <p>Výkonné obchody napojené na ERP i sklad.</p>
+            <p>Výkonné obchody bez krabicových kompromisů. Ceny a dostupnost přímo z vašich systémů.</p>
+            <p class="stack-tags">Katalog a košík / Platby / Napojení na ERP / Správa obsahu</p>
           </div>
+          <div class="stack-art" data-art="parts" data-seed="4" aria-hidden="true"></div>
         </li>
-        <li class="svc-row" data-reveal>
-          <div class="container svc-inner">
+        <li class="stack-card stack-accent">
+          <div class="stack-text">
             <h3>Interní systémy</h3>
-            <p>CRM, evidence a plánování podle vašich procesů.</p>
+            <p>Aplikace přesně podle vašeho provozu: evidence, plánování, schvalování a reporty na jednom místě.</p>
+            <p class="stack-tags">Analýza procesů / CRM a evidence / Plánování / Reporty</p>
           </div>
         </li>
-        <li class="svc-row" data-reveal>
-          <div class="container svc-inner">
+        <li class="stack-card">
+          <div class="stack-text">
             <h3>Automatizace</h3>
-            <p>Konec ručního přepisování dat mezi nástroji.</p>
+            <p>Propojíme nástroje, které už používáte. Data tečou sama a lidé dělají práci, která má smysl.</p>
+            <p class="stack-tags">Integrace API / Synchronizace dat / Notifikace / Migrace</p>
           </div>
+          <div class="stack-art" data-art="routes" data-seed="31" aria-hidden="true"></div>
         </li>
-        <li class="svc-row" data-reveal>
-          <div class="container svc-inner">
+        <li class="stack-card">
+          <div class="stack-text">
             <h3>Podpora a rozvoj</h3>
-            <p>Provoz, měření a rozvoj dlouho po spuštění.</p>
+            <p>Po spuštění neodcházíme. Hlídáme provoz, měříme výsledky a web i systém dál rozvíjíme s vámi.</p>
+            <p class="stack-tags">Monitoring / Zálohy / Úpravy a rozvoj / Konzultace</p>
           </div>
+          <div class="stack-art" data-art="stacks" data-seed="23" aria-hidden="true"></div>
         </li>
       </ul>
     </section>
 
-    <!-- ═══ PROJEKTY (HORIZONTAL PAN) ═══ -->
+    <!-- ═══ PROJEKTY (HORIZONTAL PAN, generativní vizuály) ═══ -->
     <!-- mock: ukázkové projekty, nahraďte reálnými referencemi -->
     <section class="work" id="projekty">
       <div class="work-pin">
         <div class="container work-head">
-          <h2 class="section-title">Vybrané projekty</h2>
+          <h2 class="section-title mask-title" data-reveal><span class="mt-inner">Vybrané projekty</span></h2>
         </div>
         <div class="work-track" id="workTrack">
           <article class="work-card">
-            <div class="work-media reveal-img" data-reveal><img src="https://picsum.photos/id/60/1100/734" alt="Dispečink dopravní firmy HB Logistik" loading="lazy"></div>
+            <div class="work-media reveal-img" data-reveal data-art="routes" data-seed="7" role="img" aria-label="Abstraktní schéma plánování tras"></div>
             <div class="work-meta">
               <h3>HB Logistik</h3>
               <span class="work-tag">Interní systém</span>
@@ -122,7 +167,7 @@
             </div>
           </article>
           <article class="work-card">
-            <div class="work-media reveal-img" data-reveal><img src="https://picsum.photos/id/36/1100/734" alt="B2B e-shop strojírenské firmy KOVAX" loading="lazy"></div>
+            <div class="work-media reveal-img" data-reveal data-art="parts" data-seed="21" role="img" aria-label="Abstraktní mřížka strojních dílů"></div>
             <div class="work-meta">
               <h3>KOVAX</h3>
               <span class="work-tag">E-shop</span>
@@ -130,7 +175,7 @@
             </div>
           </article>
           <article class="work-card">
-            <div class="work-media reveal-img" data-reveal><img src="https://picsum.photos/id/42/1100/734" alt="Web advokátní kanceláře Doleček a partneři" loading="lazy"></div>
+            <div class="work-media reveal-img" data-reveal data-art="paragraphs" data-seed="5" role="img" aria-label="Abstraktní bloky právního dokumentu"></div>
             <div class="work-meta">
               <h3>Doleček a partneři</h3>
               <span class="work-tag">Web</span>
@@ -138,7 +183,7 @@
             </div>
           </article>
           <article class="work-card">
-            <div class="work-media reveal-img" data-reveal><img src="https://picsum.photos/id/201/1100/734" alt="Objednávkový portál Stavebniny Beran" loading="lazy"></div>
+            <div class="work-media reveal-img" data-reveal data-art="stacks" data-seed="13" role="img" aria-label="Abstraktní skládané palety"></div>
             <div class="work-meta">
               <h3>Stavebniny Beran</h3>
               <span class="work-tag">Portál</span>
@@ -149,11 +194,24 @@
       </div>
     </section>
 
+    <!-- ═══ HŘIŠTĚ (live generátor blueprintu) ═══ -->
+    <section class="playground" id="hriste">
+      <div class="container">
+        <h2 class="section-title mask-title" data-reveal><span class="mt-inner">Hřiště</span></h2>
+        <p class="playground-sub" data-reveal>Napište název své firmy. Blueprint systému nakreslíme hned, zbytek po první schůzce.</p>
+        <div class="playground-form" data-reveal>
+          <label class="playground-label" for="pgInput">Název firmy</label>
+          <input class="playground-input" id="pgInput" type="text" maxlength="24" value="Vaše firma" autocomplete="organization">
+        </div>
+        <div class="playground-canvas" id="pgCanvas" data-reveal aria-hidden="true"></div>
+      </div>
+    </section>
+
     <!-- ═══ POSTUP ═══ -->
     <section class="process" id="postup">
       <div class="container process-grid">
         <div class="process-sticky">
-          <h2 class="section-title">Jak pracujeme</h2>
+          <h2 class="section-title mask-title" data-reveal><span class="mt-inner">Jak pracujeme</span></h2>
           <p class="process-note">Krátké iterace a ukázky průběžně. Žádné překvapení na konci projektu.</p>
         </div>
         <ol class="process-steps">
@@ -199,7 +257,7 @@
   <!-- ═══ KONTAKT + PATIČKA (inkový blok) ═══ -->
   <footer class="footer" id="kontakt">
     <div class="container footer-cta" data-reveal>
-      <h2 class="footer-title">Máte<br>projekt?</h2>
+      <h2 class="footer-title">Máte<br><span class="outline">projekt?</span></h2>
       <p class="footer-sub">Napište nám dvě věty o tom, co potřebujete. Ozveme se do 24 hodin.</p>
       <a class="footer-mail" href="mailto:studio@softlab.cz?subject=Popt%C3%A1vka%20projektu">studio@softlab.cz</a>
     </div>
@@ -212,11 +270,12 @@
       </nav>
       <p class="footer-note">© <span id="year">2026</span> Softlab</p>
     </div>
+    <div class="footer-mark" aria-hidden="true">Softlab<sup>®</sup></div>
   </footer>
 
   <script src="vendor/gsap.min.js"></script>
   <script src="vendor/ScrollTrigger.min.js"></script>
   <script src="vendor/lenis.min.js"></script>
-  <script src="main.js"></script>
+  <script src="main.js?v=7"></script>
 </body>
 </html>

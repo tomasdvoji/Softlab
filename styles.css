@@ -6,14 +6,17 @@
 
 :root {
   --paper: #f2f0ea;
+  --paper-2: #e9e6de;
   --ink: #141412;
   --muted: #5f5e57;
   --line: #d8d5cc;
   --accent: #2431e8;
+  --accent-soft: #8f97ff;
   --font-sans: "Archivo", system-ui, sans-serif;
   --font-mono: "IBM Plex Mono", ui-monospace, monospace;
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
   --pad: clamp(1.25rem, 4vw, 3rem);
+  --nav-h: 68px;
 }
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -77,6 +80,32 @@ a { color: inherit; text-decoration: none; }
   padding-inline: var(--pad);
 }
 
+/* ─── Preloader (jen s JS, curtain nahoru) ─── */
+.loader { display: none; }
+html.js .loader {
+  position: fixed;
+  inset: 0;
+  z-index: 300;
+  background: var(--ink);
+  display: grid;
+  place-items: center;
+}
+html.js .loader.done { display: none; }
+.loader-mask { overflow: hidden; display: block; }
+.loader-word {
+  display: inline-block;
+  color: var(--paper);
+  font-weight: 850;
+  font-stretch: 120%;
+  text-transform: uppercase;
+  font-size: clamp(2.4rem, 7vw, 5.5rem);
+  line-height: 1.05;
+}
+.loader-word sup { font-size: 0.45em; font-weight: 600; }
+@media (prefers-reduced-motion: reduce) {
+  html.js .loader { display: none; }
+}
+
 /* ─── Typografie ─── */
 .section-title {
   font-size: clamp(2.2rem, 5.5vw, 4.5rem);
@@ -87,6 +116,8 @@ a { color: inherit; text-decoration: none; }
   line-height: 0.95;
   margin-bottom: clamp(2.5rem, 5vw, 4.5rem);
 }
+.mask-title { overflow: hidden; padding-block: 0.06em; }
+.mt-inner { display: inline-block; }
 
 /* podtržený odkaz s animovanou linkou */
 .u-link {
@@ -140,7 +171,7 @@ a { color: inherit; text-decoration: none; }
   max-width: 1360px;
   margin-inline: auto;
   padding-inline: var(--pad);
-  height: 68px;
+  height: var(--nav-h);
   display: flex;
   align-items: center;
   gap: 2.5rem;
@@ -202,10 +233,10 @@ a { color: inherit; text-decoration: none; }
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: 1.5rem;
+  gap: 1.4rem;
 }
 .mobile-menu nav a {
-  font-size: clamp(2.2rem, 9vw, 3.2rem);
+  font-size: clamp(2rem, 8.5vw, 3rem);
   font-weight: 800;
   font-stretch: 115%;
   text-transform: uppercase;
@@ -226,15 +257,43 @@ a { color: inherit; text-decoration: none; }
 
 /* ─── Hero ─── */
 .hero {
+  position: relative;
   min-height: 100dvh;
   display: flex;
   align-items: flex-end;
   border-bottom: 1px solid var(--line);
   padding-bottom: clamp(2rem, 5vh, 4rem);
+  overflow: hidden;
 }
-.hero-inner { width: 100%; padding-top: 84px; }
+.hero-line-art {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+.hero-path {
+  stroke: var(--accent);
+  stroke-width: 2.5;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 0;
+}
+@media (prefers-reduced-motion: no-preference) {
+  html.js .hero-path {
+    animation: drawline 1.6s var(--ease-out) 1.2s both;
+  }
+  @keyframes drawline {
+    from { stroke-dashoffset: 1; }
+    to { stroke-dashoffset: 0; }
+  }
+}
+.hero-inner {
+  position: relative;
+  width: 100%;
+  padding-top: 84px;
+}
 .hero-title {
-  font-size: clamp(2.7rem, 10.2vw, 10rem);
+  font-size: clamp(2.4rem, 7.9vw, 6.9rem);
   font-weight: 850;
   font-stretch: 120%;
   text-transform: uppercase;
@@ -244,10 +303,12 @@ a { color: inherit; text-decoration: none; }
 .hero-title .line {
   display: block;
   overflow: hidden;
-  padding-block: 0.04em; /* rezerva na diakritiku a spodní dotahy při maskování */
+  padding-block: 0.04em; /* rezerva na diakritiku při maskování */
 }
 .hero-title .line-inner { display: inline-block; }
-.hero-accent { color: var(--accent); }
+.line-indent { margin-left: 7%; }
+.line-right { text-align: right; }
+.hero-accent { color: var(--accent); font-style: normal; }
 .hero-foot {
   margin-top: clamp(2.5rem, 6vh, 4.5rem);
   display: flex;
@@ -260,6 +321,10 @@ a { color: inherit; text-decoration: none; }
   max-width: 44ch;
   color: var(--muted);
   font-size: clamp(1.05rem, 1.4vw, 1.2rem);
+}
+@media (max-width: 700px) {
+  .line-indent { margin-left: 4%; }
+  .line-right { text-align: left; }
 }
 
 /* ─── Manifest ─── */
@@ -274,58 +339,93 @@ a { color: inherit; text-decoration: none; }
 }
 .manifesto-text .word { display: inline-block; }
 
-/* ─── Služby (index rows) ─── */
-.services { padding-block: clamp(4rem, 8vw, 7rem) 0; }
-.svc-list { list-style: none; border-top: 1px solid var(--line); }
-.svc-row {
-  position: relative;
-  border-bottom: 1px solid var(--line);
-  overflow: hidden;
-}
-.svc-row::before {
-  content: "";
-  position: absolute;
-  inset: 0;
+/* ─── Velocity pás (rychlost scrollu žene marquee) ─── */
+.velocity {
   background: var(--ink);
-  transform: scaleY(0);
-  transform-origin: bottom;
-  transition: transform 0.45s var(--ease-out);
+  overflow: hidden;
+  padding-block: clamp(1.1rem, 2.4vw, 2rem);
 }
-.svc-inner {
-  position: relative;
+.velocity-track {
+  display: flex;
+  width: max-content;
+  will-change: transform;
+}
+.velocity-group {
   display: flex;
   align-items: baseline;
-  justify-content: space-between;
-  gap: 2rem;
-  padding-block: clamp(1.5rem, 3.2vw, 2.6rem);
+  gap: clamp(2.2rem, 5vw, 4.5rem);
+  padding-right: clamp(2.2rem, 5vw, 4.5rem);
 }
-.svc-row h3 {
-  font-size: clamp(1.9rem, 4.8vw, 4rem);
+.vw {
+  font-size: clamp(2.2rem, 5.4vw, 4.4rem);
+  font-weight: 850;
+  font-stretch: 118%;
+  text-transform: uppercase;
+  letter-spacing: -0.01em;
+  line-height: 1;
+  color: var(--paper);
+  white-space: nowrap;
+}
+.vw-outline {
+  color: transparent;
+  -webkit-text-stroke: 2px var(--paper);
+}
+@supports not (-webkit-text-stroke: 2px black) {
+  .vw-outline { color: var(--paper); }
+}
+
+/* ─── Služby (sticky stack karet) ─── */
+.services { padding-block: clamp(4rem, 8vw, 7rem) clamp(4rem, 8vw, 7rem); }
+.stack { list-style: none; }
+.stack-card {
+  background: var(--paper-2);
+  border: 1px solid var(--ink);
+  min-height: 62vh;
+  display: grid;
+  grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+  gap: clamp(1.5rem, 3vw, 3rem);
+  align-items: center;
+  padding: clamp(1.75rem, 4vw, 4rem);
+  margin-bottom: 5vh;
+}
+.stack-card h3 {
+  font-size: clamp(2rem, 4.6vw, 3.9rem);
   font-weight: 800;
   font-stretch: 115%;
   text-transform: uppercase;
   letter-spacing: -0.01em;
-  line-height: 1;
-  transition: color 0.35s var(--ease-out), transform 0.45s var(--ease-out);
+  line-height: 0.95;
+  margin-bottom: 1.25rem;
 }
-.svc-row p {
-  color: var(--muted);
-  max-width: 34ch;
-  text-align: right;
-  transition: color 0.35s var(--ease-out);
+.stack-card p { color: var(--muted); max-width: 44ch; }
+.stack-tags {
+  margin-top: 1.5rem;
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--accent);
 }
-@media (hover: hover) and (prefers-reduced-motion: no-preference) {
-  .svc-row:hover::before { transform: scaleY(1); }
-  .svc-row:hover h3 { color: var(--paper); transform: translateX(0.5rem); }
-  .svc-row:hover p { color: var(--line); }
+.stack-art { align-self: stretch; min-height: 240px; }
+.stack-art svg { width: 100%; height: 100%; display: block; }
+.stack-accent { background: var(--accent); border-color: var(--accent); grid-template-columns: 1fr; }
+.stack-accent h3 { color: var(--paper); }
+.stack-accent p { color: #cdd2ff; max-width: 52ch; }
+.stack-accent .stack-tags { color: var(--paper); }
+
+@media (min-width: 1024px) {
+  .stack-card {
+    position: sticky;
+    top: calc(var(--nav-h) + 24px);
+  }
 }
-@media (max-width: 700px) {
-  .svc-inner { flex-direction: column; align-items: flex-start; gap: 0.5rem; }
-  .svc-row p { text-align: left; }
+@media (max-width: 1023px) {
+  .stack-card { grid-template-columns: 1fr; min-height: 0; }
+  .stack-art { min-height: 0; height: 200px; order: -1; }
 }
 
 /* ─── Projekty (horizontal pan) ─── */
-.work { border-bottom: 1px solid var(--line); }
+.work { border-block: 1px solid var(--line); }
 .work-pin {
   padding-block: clamp(4rem, 8vw, 7rem);
   overflow: hidden;
@@ -350,16 +450,16 @@ a { color: inherit; text-decoration: none; }
 .work-media {
   overflow: hidden;
   aspect-ratio: 3 / 2;
-  background: var(--line);
+  background: var(--paper-2);
+  border: 1px solid var(--line);
 }
-.work-media img {
+.work-media svg {
   width: 100%;
   height: 100%;
-  object-fit: cover;
-  filter: grayscale(1) contrast(1.05);
-  transition: filter 0.5s var(--ease-out), transform 0.7s var(--ease-out);
+  display: block;
+  transition: transform 0.7s var(--ease-out);
 }
-.work-card:hover .work-media img { filter: none; transform: scale(1.03); }
+.work-card:hover .work-media svg { transform: scale(1.04); }
 .work-meta {
   padding-top: 1.1rem;
   display: grid;
@@ -395,8 +495,50 @@ a { color: inherit; text-decoration: none; }
   .work-card { width: 100%; }
 }
 
+/* ─── Hřiště (live blueprint) ─── */
+.playground { padding-block: clamp(4rem, 8vw, 7rem); }
+.playground-sub { color: var(--muted); max-width: 52ch; margin-top: -1.5rem; }
+.playground-form {
+  margin-top: 2.5rem;
+  max-width: 420px;
+}
+.playground-label {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+  margin-bottom: 0.6rem;
+}
+.playground-input {
+  width: 100%;
+  min-height: 52px;
+  padding: 0.6rem 1rem;
+  font: inherit;
+  font-weight: 600;
+  color: var(--ink);
+  background: var(--paper);
+  border: 2px solid var(--ink);
+  border-radius: 0;
+}
+.playground-input:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+.playground-canvas {
+  margin-top: 2rem;
+  background: var(--paper-2);
+  border: 1px solid var(--ink);
+}
+.playground-canvas svg { width: 100%; height: auto; display: block; }
+.playground-canvas text {
+  font-family: var(--font-mono);
+  letter-spacing: 0.08em;
+}
+
 /* ─── Postup ─── */
-.process { padding-block: clamp(4rem, 8vw, 7rem); }
+.process { padding-block: clamp(4rem, 8vw, 7rem); border-top: 1px solid var(--line); }
 .process-grid {
   display: grid;
   grid-template-columns: 5fr 7fr;
@@ -453,6 +595,7 @@ a { color: inherit; text-decoration: none; }
 .footer {
   background: var(--ink);
   color: var(--paper);
+  overflow: hidden;
 }
 .footer-cta {
   padding-block: clamp(5rem, 11vw, 10rem) clamp(4rem, 8vw, 7rem);
@@ -463,7 +606,14 @@ a { color: inherit; text-decoration: none; }
   font-stretch: 120%;
   text-transform: uppercase;
   letter-spacing: -0.015em;
-  line-height: 0.92;
+  line-height: 0.98;
+}
+.footer-title .outline {
+  color: transparent;
+  -webkit-text-stroke: 3px var(--paper);
+}
+@supports not (-webkit-text-stroke: 3px black) {
+  .footer-title .outline { color: var(--paper); }
 }
 .footer-sub {
   margin-top: 2rem;
@@ -482,7 +632,7 @@ a { color: inherit; text-decoration: none; }
   padding-bottom: 0.1em;
   transition: color 0.3s var(--ease-out);
 }
-.footer-mail:hover { color: #8f97ff; }
+.footer-mail:hover { color: var(--accent-soft); }
 .footer-bottom {
   display: flex;
   align-items: center;
@@ -512,6 +662,21 @@ a { color: inherit; text-decoration: none; }
 .footer-links a:hover { color: var(--paper); }
 .footer-note { color: #b3b1a8; font-size: 0.9rem; }
 
+/* obří wordmark na úplný závěr */
+.footer-mark {
+  font-size: 17.5vw;
+  font-weight: 850;
+  font-stretch: 120%;
+  text-transform: uppercase;
+  letter-spacing: -0.015em;
+  line-height: 0.78;
+  text-align: center;
+  white-space: nowrap;
+  margin-bottom: -0.16em; /* useknout pod účařím, klasický editorial závěr */
+  color: var(--paper);
+}
+.footer-mark sup { font-size: 0.22em; font-weight: 600; vertical-align: 2.2em; }
+
 /* ─── Reveal (JS přidá .revealed) ─── */
 @media (prefers-reduced-motion: no-preference) {
   html.js [data-reveal] {
@@ -523,12 +688,25 @@ a { color: inherit; text-decoration: none; }
     opacity: 1;
     transform: none;
   }
-  /* obrázky se odhalují maskou zdola */
+  /* titulky jedou maskou zdola, ne fadem */
+  html.js .mask-title[data-reveal] {
+    opacity: 1;
+    transform: none;
+  }
+  html.js .mask-title[data-reveal] .mt-inner {
+    transform: translateY(115%);
+    transition: transform 0.9s var(--ease-out);
+  }
+  html.js .mask-title[data-reveal].revealed .mt-inner { transform: none; }
+  /* vizuály se odhalují maskou zdola; klipujeme vnitřní svg, ne pozorovaný
+     element - clip-path na targetu by IntersectionObserver nikdy nesepnul */
   html.js .reveal-img[data-reveal] {
     transform: none;
     opacity: 1;
-    clip-path: inset(100% 0 0 0);
-    transition: clip-path 0.9s var(--ease-out);
   }
-  html.js .reveal-img[data-reveal].revealed { clip-path: inset(0 0 0 0); }
+  html.js .reveal-img[data-reveal] svg {
+    clip-path: inset(100% 0 0 0);
+    transition: clip-path 0.9s var(--ease-out), transform 0.7s var(--ease-out);
+  }
+  html.js .reveal-img[data-reveal].revealed svg { clip-path: inset(0 0 0 0); }
 }
