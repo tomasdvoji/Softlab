@@ -116,7 +116,7 @@ html.js .loader.done { display: none; }
   line-height: 0.95;
   margin-bottom: clamp(2.5rem, 5vw, 4.5rem);
 }
-.mask-title { overflow: hidden; padding-block: 0.06em; }
+.mask-title { overflow: hidden; padding-block: 0.14em; margin-block: -0.14em; }
 .mt-inner { display: inline-block; }
 
 /* podtržený odkaz s animovanou linkou */
@@ -303,7 +303,10 @@ html.js .loader.done { display: none; }
 .hero-title .line {
   display: block;
   overflow: hidden;
-  padding-block: 0.04em; /* rezerva na diakritiku při maskování */
+  /* maska potřebuje rezervu na diakritiku a dotahy; záporný margin
+     ji zase stáhne, aby řádky zůstaly typograficky natěsno */
+  padding-block: 0.14em;
+  margin-block: -0.14em;
 }
 .hero-title .line-inner { display: inline-block; }
 .line-indent { margin-left: 7%; }

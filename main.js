@@ -284,7 +284,7 @@
 
     /* Hero: masked line reveal (po preloaderu) */
     gsap.from(".hero-title .line-inner", {
-      yPercent: 115,
+      yPercent: 135, /* mask má padding, menší posun by nechal vykouknout proužek */
       duration: 1.1,
       stagger: 0.1,
       ease: "power4.out",
