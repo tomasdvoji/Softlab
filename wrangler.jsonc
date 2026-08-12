@@ -25,7 +25,8 @@
     // requestu daný Workers plánem: Free 100 MB, Paid 200-500 MB)
     "MAX_FILE_MB": "500",
     "MAX_SUBMISSION_MB": "2000",
-    "ALLOWED_EXTENSIONS": "jpg,jpeg,png,gif,webp,svg,heic,avif,pdf,zip,rar,7z,txt,md,rtf,csv,xls,xlsx,doc,docx,ppt,pptx,odt,ods,odp,json,xml,ai,psd,indd,fig,sketch,mp4,mov,webm,mp3,wav,dwg,dxf"
+    "ALLOWED_EXTENSIONS": "jpg,jpeg,png,gif,webp,svg,heic,avif,pdf,zip,rar,7z,txt,md,rtf,csv,xls,xlsx,doc,docx,ppt,pptx,odt,ods,odp,json,xml,ai,psd,indd,fig,sketch,mp4,mov,webm,mp3,wav,dwg,dxf",
+    "ADMIN_USER": "admin"
     // tajné hodnoty (wrangler secret put / .dev.vars):
     //   ADMIN_PASSWORD  - heslo do administrace
     //   SESSION_SECRET  - klíč pro podpis session cookie

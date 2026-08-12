@@ -48,8 +48,10 @@ export function adminLoginHtml() {
     <a class="logo" href="/">Softlab<sup>®</sup></a>
     <h1 style="margin-top:2.5rem">Administrace<br>podkladů</h1>
     <form id="loginForm">
-      <label for="pw">Heslo administrátora</label>
-      <input type="password" id="pw" autocomplete="current-password" required autofocus>
+      <label for="user">Přihlašovací jméno</label>
+      <input type="text" id="user" autocomplete="username" required autofocus style="margin-bottom:1rem">
+      <label for="pw">Heslo</label>
+      <input type="password" id="pw" autocomplete="current-password" required>
       <button type="submit">Přihlásit se</button>
       <p class="error" id="loginError" role="alert"></p>
     </form>
@@ -64,7 +66,7 @@ document.getElementById('loginForm').addEventListener('submit', async function (
     var res = await fetch('/api/admin/login', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'X-Requested-With': 'fetch' },
-      body: JSON.stringify({ password: document.getElementById('pw').value })
+      body: JSON.stringify({ username: document.getElementById('user').value, password: document.getElementById('pw').value })
     });
     var data = await res.json();
     if (res.ok) { location.reload(); }

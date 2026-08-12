@@ -329,8 +329,9 @@ async function adminLogin(request, env) {
   }
   let body;
   try { body = await request.json(); } catch { return err(400, "Neplatný požadavek."); }
-  const ok = await timingSafeEq(String(body.password || ""), env.ADMIN_PASSWORD);
-  if (!ok) return err(401, "Nesprávné heslo.");
+  const userOk = await timingSafeEq(String(body.username || ""), env.ADMIN_USER || "admin");
+  const passOk = await timingSafeEq(String(body.password || ""), env.ADMIN_PASSWORD);
+  if (!userOk || !passOk) return err(401, "Nesprávné přihlašovací údaje.");
   const token = await makeSession(env);
   return json({ ok: true }, 200, { "Set-Cookie": sessionCookie(token, SESSION_HOURS * 3600) });
 }
