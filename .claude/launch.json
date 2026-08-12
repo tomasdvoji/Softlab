@@ -4,8 +4,14 @@
     {
       "name": "softlab-static",
       "runtimeExecutable": "python",
-      "runtimeArgs": ["-m", "http.server", "4173"],
+      "runtimeArgs": ["-m", "http.server", "4173", "-d", "public"],
       "port": 4173
+    },
+    {
+      "name": "softlab-portal",
+      "runtimeExecutable": "npx.cmd",
+      "runtimeArgs": ["wrangler", "dev", "--port", "8788"],
+      "port": 8788
     }
   ]
 }

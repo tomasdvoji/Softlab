@@ -1,0 +1,17 @@
+{
+  "name": "softlab",
+  "private": true,
+  "scripts": {
+    "dev": "wrangler dev",
+    "build": "echo \"Statický web bez build stepu - nic k sestavení\"",
+    "deploy": "wrangler deploy",
+    "db:migrate:local": "wrangler d1 migrations apply softlab-portal --local",
+    "db:migrate:remote": "wrangler d1 migrations apply softlab-portal --remote"
+  },
+  "devDependencies": {
+    "wrangler": "^4.121.0"
+  },
+  "allowScripts": {
+    "workerd@1.20260804.1": true
+  }
+}

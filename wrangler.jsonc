@@ -1,0 +1,34 @@
+{
+  // Softlab web + klientský portál (/files, /admin/files)
+  "name": "softlab",
+  "main": "src/worker.js",
+  "compatibility_date": "2026-08-01",
+  "assets": {
+    "directory": "./public",
+    "binding": "ASSETS",
+    "not_found_handling": "none",
+    // /api a /admin jde vždy do Workeru, statika se servíruje přímo
+    "run_worker_first": ["/api/*", "/admin/*"]
+  },
+  "r2_buckets": [
+    { "binding": "UPLOADS", "bucket_name": "softlab-uploads" }
+  ],
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "softlab-portal",
+      "database_id": "b6557266-386e-4a46-899c-95762a01681e"
+    }
+  ],
+  "vars": {
+    // limity uploadů; skutečné maximum na soubor je min(MAX_FILE_MB, limit těla
+    // requestu daný Workers plánem: Free 100 MB, Paid 200-500 MB)
+    "MAX_FILE_MB": "500",
+    "MAX_SUBMISSION_MB": "2000",
+    "ALLOWED_EXTENSIONS": "jpg,jpeg,png,gif,webp,svg,heic,avif,pdf,zip,rar,7z,txt,md,rtf,csv,xls,xlsx,doc,docx,ppt,pptx,odt,ods,odp,json,xml,ai,psd,indd,fig,sketch,mp4,mov,webm,mp3,wav,dwg,dxf"
+    // tajné hodnoty (wrangler secret put / .dev.vars):
+    //   ADMIN_PASSWORD  - heslo do administrace
+    //   SESSION_SECRET  - klíč pro podpis session cookie
+  },
+  "observability": { "enabled": true }
+}

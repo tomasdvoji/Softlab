@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Předání podkladů · Softlab</title>
+  <meta name="description" content="Nahrajte nám soubory a informace potřebné k realizaci vašeho projektu.">
+  <meta name="robots" content="noindex">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' fill='%23141412'/%3E%3Ctext x='32' y='45' font-family='Arial,sans-serif' font-size='38' font-weight='800' text-anchor='middle' fill='%23f2f0ea'%3ES%3C/text%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/styles.css">
+  <link rel="stylesheet" href="portal.css">
+</head>
+<body>
+  <header class="portal-nav">
+    <a class="nav-logo" href="/" aria-label="Softlab, úvod">Softlab<sup>®</sup></a>
+    <a class="u-link" href="/">Zpět na web</a>
+  </header>
+
+  <main class="portal container">
+    <!-- ═══ FORMULÁŘ ═══ -->
+    <div id="formView">
+      <h1 class="portal-title">Předání<br>podkladů</h1>
+      <p class="portal-sub">Nahrajte zde všechny soubory a informace potřebné k realizaci vašeho projektu.</p>
+
+      <form id="portalForm" novalidate>
+        <section class="pf-section">
+          <h2><span class="pf-num">1</span> Kontaktní údaje</h2>
+          <div class="pf-grid">
+            <div class="pf-field">
+              <label for="fName">Jméno / název firmy *</label>
+              <input type="text" id="fName" name="clientName" autocomplete="name" maxlength="200" required>
+            </div>
+            <div class="pf-field">
+              <label for="fCompany">Firma <span class="pf-opt">(volitelně)</span></label>
+              <input type="text" id="fCompany" name="companyName" autocomplete="organization" maxlength="200">
+            </div>
+            <div class="pf-field">
+              <label for="fEmail">E-mail *</label>
+              <input type="email" id="fEmail" name="email" autocomplete="email" maxlength="200" required>
+            </div>
+            <div class="pf-field">
+              <label for="fPhone">Telefon <span class="pf-opt">(volitelně)</span></label>
+              <input type="tel" id="fPhone" name="phone" autocomplete="tel" maxlength="50">
+            </div>
+            <div class="pf-field pf-field-wide">
+              <label for="fProject">Název projektu nebo zakázky *</label>
+              <input type="text" id="fProject" name="projectName" maxlength="200" required>
+            </div>
+          </div>
+        </section>
+
+        <section class="pf-section">
+          <h2><span class="pf-num">2</span> Instrukce</h2>
+          <div class="pf-field">
+            <label for="fInstructions">Co máme vědět? Popište zadání, požadavky, termíny…</label>
+            <textarea id="fInstructions" name="instructions" rows="7" maxlength="20000"
+              placeholder="Sem napište instrukce. Případně můžete níže přiložit vlastní soubor s instrukcemi (např. TXT)."></textarea>
+          </div>
+        </section>
+
+        <section class="pf-section">
+          <h2><span class="pf-num">3</span> Soubory</h2>
+          <div class="dropzone" id="dropzone" tabindex="0" role="button"
+               aria-label="Přetáhněte soubory sem, nebo stiskněte Enter pro výběr souborů">
+            <p class="dz-big">Přetáhněte soubory sem</p>
+            <p class="dz-or">nebo</p>
+            <span class="btn-solid" aria-hidden="true">Vybrat soubory</span>
+            <p class="dz-hint">Dokumenty, obrázky, PDF, ZIP, tabulky… velikost do <span id="maxFileLabel">500</span>&nbsp;MB na soubor.</p>
+          </div>
+          <input type="file" id="fileInput" multiple hidden>
+          <ul class="file-list" id="fileList" aria-live="polite"></ul>
+        </section>
+
+        <p class="pf-error" id="formError" role="alert"></p>
+
+        <div class="pf-submit">
+          <button type="submit" class="btn-solid btn-big" id="submitBtn">Odeslat podklady</button>
+        </div>
+
+        <div class="progress" id="progressBox" hidden>
+          <p class="progress-label" id="progressLabel" aria-live="polite">Nahrávání podkladů – 0 %</p>
+          <div class="progress-track" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="progressBar">
+            <div class="progress-fill" id="progressFill"></div>
+          </div>
+        </div>
+      </form>
+    </div>
+
+    <!-- ═══ POTVRZENÍ ═══ -->
+    <div id="successView" hidden>
+      <h1 class="portal-title">Podklady byly<br>úspěšně odeslány</h1>
+      <p class="portal-sub">Děkujeme. Vaše soubory jsme přijali.</p>
+      <p class="success-ref">ID podkladů: <strong id="successRef" class="mono-ref">FILES-XXXXXX</strong></p>
+      <p class="portal-sub">Toto ID si prosím poznamenejte pro případnou komunikaci.</p>
+      <button type="button" class="btn-ghost-p" id="resetBtn">Odeslat další podklady</button>
+    </div>
+  </main>
+
+  <footer class="portal-footer">
+    <span>© <span id="year">2026</span> Softlab</span>
+    <a href="mailto:studio@softlab.cz">studio@softlab.cz</a>
+  </footer>
+
+  <script src="portal.js"></script>
+</body>
+</html>
