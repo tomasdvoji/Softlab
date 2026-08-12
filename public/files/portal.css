@@ -29,6 +29,9 @@
   font-size: 1.05rem;
 }
 
+.gate-form { max-width: 420px; margin-top: 2.5rem; display: grid; gap: 1.25rem; }
+.gate-form .pf-error { margin-top: 0; }
+
 .pf-section { margin-top: clamp(2.5rem, 5vw, 3.5rem); }
 .pf-section h2 {
   font-weight: 800;

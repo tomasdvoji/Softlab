@@ -22,8 +22,45 @@
   var items = [];
   var submission = null; // {id, publicReference, maxFileBytes, allowedExtensions}
   var running = false;
+  var invite = null; // {token, name, password} u personalizovaného odkazu
 
   document.getElementById("year").textContent = String(new Date().getFullYear());
+
+  /* ─── brána pro klientský odkaz (?k=TOKEN) ─── */
+  (function gate() {
+    var token = new URLSearchParams(location.search).get("k");
+    if (!token) return;
+    var gateView = document.getElementById("gateView");
+    var gateError = document.getElementById("gateError");
+    var gateBtn = document.getElementById("gateBtn");
+    document.getElementById("formView").hidden = true;
+    gateView.hidden = false;
+
+    document.getElementById("gateForm").addEventListener("submit", async function (e) {
+      e.preventDefault();
+      gateError.textContent = "";
+      gateBtn.disabled = true;
+      var name = document.getElementById("gName").value;
+      var password = document.getElementById("gPass").value;
+      try {
+        var res = await fetch("/api/invites/" + encodeURIComponent(token) + "/verify", {
+          method: "POST",
+          headers: { "Content-Type": "application/json", "X-Requested-With": "fetch" },
+          body: JSON.stringify({ name: name, password: password }),
+        });
+        var data = await res.json();
+        if (!res.ok) throw new Error(data.error || "Přihlášení se nezdařilo.");
+        invite = { token: token, name: name, password: password };
+        document.getElementById("fName").value = data.clientName;
+        gateView.hidden = true;
+        document.getElementById("formView").hidden = false;
+        window.scrollTo(0, 0);
+      } catch (errG) {
+        gateError.textContent = errG.message;
+      }
+      gateBtn.disabled = false;
+    });
+  })();
 
   /* ─── výběr souborů ─── */
 
@@ -218,6 +255,9 @@
           phone: fieldValue("fPhone"),
           projectName: fieldValue("fProject"),
           instructions: fieldValue("fInstructions"),
+          inviteToken: invite ? invite.token : undefined,
+          inviteName: invite ? invite.name : undefined,
+          invitePassword: invite ? invite.password : undefined,
         });
         document.getElementById("maxFileLabel").textContent = String(Math.floor(submission.maxFileBytes / 1024 / 1024));
       }

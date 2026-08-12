@@ -20,6 +20,24 @@
   </header>
 
   <main class="portal container">
+    <!-- ═══ BRÁNA PRO KLIENTSKÝ ODKAZ ═══ -->
+    <div id="gateView" hidden>
+      <h1 class="portal-title">Předání<br>podkladů</h1>
+      <p class="portal-sub">Tento odkaz je určený jen pro vás. Přihlaste se prosím jménem a heslem, které jsme vám poslali.</p>
+      <form id="gateForm" class="gate-form" novalidate>
+        <div class="pf-field">
+          <label for="gName">Jméno</label>
+          <input type="text" id="gName" autocomplete="username" maxlength="200" required>
+        </div>
+        <div class="pf-field">
+          <label for="gPass">Heslo</label>
+          <input type="password" id="gPass" autocomplete="current-password" maxlength="50" required>
+        </div>
+        <p class="pf-error" id="gateError" role="alert"></p>
+        <button type="submit" class="btn-solid btn-big" id="gateBtn">Pokračovat</button>
+      </form>
+    </div>
+
     <!-- ═══ FORMULÁŘ ═══ -->
     <div id="formView">
       <h1 class="portal-title">Předání<br>podkladů</h1>

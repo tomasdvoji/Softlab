@@ -110,6 +110,14 @@ export function adminAppHtml() {
   .actions { display:flex; gap:.75rem; flex-wrap:wrap; margin:1.5rem 0 2rem; align-items:center; }
   .txt-preview { background:var(--ink); color:var(--paper); font-family:ui-monospace,monospace; font-size:.8rem; padding:1rem; white-space:pre-wrap; overflow-wrap:anywhere; max-height:260px; overflow:auto; }
   .status { min-height:1.4em; margin-top:.5rem; }
+  .invites { margin-bottom:1.5rem; }
+  .invites-panel { border:1px solid var(--line); background:var(--paper2); padding:1.25rem; margin-top:.75rem; }
+  .invite-form { display:flex; gap:.75rem; flex-wrap:wrap; }
+  .invite-form input { flex:1; min-width:200px; }
+  .invite-result { margin-top:1rem; overflow-wrap:anywhere; }
+  .invite-result .actions { margin:0.75rem 0 0; }
+  .invite-row { display:flex; align-items:center; gap:.75rem; border-top:1px solid var(--line); padding:.7rem 0; flex-wrap:wrap; }
+  .invite-row .file-info { flex:1; min-width:220px; }
   @media (max-width:720px) { .hide-m { display:none; } }
 </style>
 </head>
@@ -162,6 +170,97 @@ document.getElementById('logoutBtn').addEventListener('click', async function ()
   location.reload();
 });
 
+/* ── klientské odkazy ── */
+function mailtoFor(inv) {
+  var subject = 'Předání podkladů · Softlab';
+  var body = 'Dobrý den,\n\npro předání podkladů k vaší zakázce prosím použijte tento odkaz:\n'
+    + inv.url + '\n\nPřihlašovací jméno: ' + inv.clientName
+    + (inv.password ? '\nHeslo: ' + inv.password : '')
+    + '\n\nDěkujeme,\nSoftlab';
+  return 'mailto:' + encodeURIComponent(inv.email || '') + '?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(body);
+}
+
+function invitesPanel() {
+  var box = el('div', { class:'invites' });
+  var toggle = el('button', { class:'ghost', text:'Klientské odkazy', 'aria-expanded':'false' });
+  var panel = el('div', { class:'invites-panel' });
+  panel.hidden = true;
+  toggle.addEventListener('click', function () {
+    panel.hidden = !panel.hidden;
+    toggle.setAttribute('aria-expanded', String(!panel.hidden));
+    if (!panel.hidden) loadInvites();
+  });
+
+  var nameIn = el('input', { type:'text', placeholder:'Jméno klienta / firma', 'aria-label':'Jméno klienta' });
+  var mailIn = el('input', { type:'text', placeholder:'E-mail klienta (volitelně)', 'aria-label':'E-mail klienta' });
+  var createBtn = el('button', { text:'Vygenerovat odkaz' });
+  var result = el('div', { class:'invite-result' });
+  var listWrap = el('div');
+  var status = el('p', { class:'error' });
+
+  createBtn.addEventListener('click', async function () {
+    status.textContent = '';
+    result.textContent = '';
+    createBtn.disabled = true;
+    try {
+      var inv = await api('/api/admin/invites', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ clientName: nameIn.value, email: mailIn.value })
+      });
+      nameIn.value = ''; mailIn.value = '';
+      var copyBtn = el('button', { class:'ghost', text:'Zkopírovat odkaz', onclick: function () {
+        navigator.clipboard.writeText(inv.url); copyBtn.textContent = 'Zkopírováno'; } });
+      var copyAllBtn = el('button', { class:'ghost', text:'Zkopírovat údaje', onclick: function () {
+        navigator.clipboard.writeText('Odkaz: ' + inv.url + '\nJméno: ' + inv.clientName + '\nHeslo: ' + inv.password);
+        copyAllBtn.textContent = 'Zkopírováno'; } });
+      result.appendChild(el('p', {}, [ el('strong', { text: inv.clientName }),
+        el('span', { class:'muted', text: inv.email ? ' · ' + inv.email : '' }) ]));
+      result.appendChild(el('p', { class:'mono', text: inv.url }));
+      result.appendChild(el('p', {}, [ el('span', { text:'Heslo: ' }), el('strong', { class:'mono', text: inv.password }),
+        el('span', { class:'muted', text: ' (zobrazí se jen teď, uložte si ho)' }) ]));
+      var actions = el('div', { class:'actions' }, [ copyBtn, copyAllBtn ]);
+      if (inv.email) actions.appendChild(el('a', { class:'btn', href: mailtoFor(inv), text:'Poslat e-mailem' }));
+      result.appendChild(actions);
+      loadInvites();
+    } catch (e) { status.textContent = e.message; }
+    createBtn.disabled = false;
+  });
+
+  async function loadInvites() {
+    try {
+      var data = await api('/api/admin/invites');
+      listWrap.textContent = '';
+      if (!data.invites.length) { listWrap.appendChild(el('p', { class:'muted', text:'Zatím žádné odkazy.' })); return; }
+      data.invites.forEach(function (i) {
+        var row = el('div', { class:'invite-row' }, [
+          el('div', { class:'file-info' }, [
+            el('strong', { text: i.client_name }),
+            el('div', { class:'muted', text: (i.email || 'bez e-mailu') + ' · ' + fmtDate(i.created_at) + ' · zakázek: ' + i.submission_count }),
+          ]),
+          el('button', { class:'ghost', text:'Kopírovat odkaz', onclick: function (e) {
+            navigator.clipboard.writeText(location.origin + '/files/?k=' + i.id);
+            e.target.textContent = 'Zkopírováno'; } }),
+          el('button', { class:'danger', text:'Zrušit', onclick: async function () {
+            if (!confirm('Zrušit odkaz pro "' + i.client_name + '"? Klient se přes něj už nepřihlásí.')) return;
+            try { await api('/api/admin/invites/' + i.id, { method:'DELETE' }); loadInvites(); }
+            catch (e2) { status.textContent = e2.message; }
+          } }),
+        ]);
+        listWrap.appendChild(row);
+      });
+    } catch (e) { status.textContent = e.message; }
+  }
+
+  panel.appendChild(el('div', { class:'invite-form' }, [ nameIn, mailIn, createBtn ]));
+  panel.appendChild(result);
+  panel.appendChild(status);
+  panel.appendChild(listWrap);
+  box.appendChild(toggle);
+  box.appendChild(panel);
+  return box;
+}
+
 /* ── seznam ── */
 async function renderList() {
   var q = '';
@@ -170,6 +269,7 @@ async function renderList() {
     oninput: debounce(function (e) { q = e.target.value; load(); }, 300) });
   var tableWrap = el('div');
   app.appendChild(el('h1', { text: 'Podklady klientů' }));
+  app.appendChild(invitesPanel());
   app.appendChild(search);
   app.appendChild(tableWrap);
 

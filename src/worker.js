@@ -62,6 +62,34 @@ function publicReference() {
   return "FILES-" + out;
 }
 
+function friendlyPassword() {
+  const bytes = crypto.getRandomValues(new Uint8Array(8));
+  let out = "";
+  for (let i = 0; i < 8; i++) {
+    out += REF_ALPHABET[bytes[i] % REF_ALPHABET.length];
+    if (i === 3) out += "-";
+  }
+  return out;
+}
+
+/* jméno klienta porovnáváme bez ohledu na velikost písmen a diakritiku */
+function normName(s) {
+  return String(s || "").trim().toLowerCase().normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "").replace(/\s+/g, " ");
+}
+
+async function inviteHash(env, token, name, password) {
+  return hmacHex(env.SESSION_SECRET, "invite:" + token + ":" + normName(name) + ":" + password);
+}
+
+async function checkInvite(env, token, name, password) {
+  if (!/^[a-z0-9]{20}$/.test(token || "")) return null;
+  const invite = await env.DB.prepare("SELECT * FROM invites WHERE id = ?").bind(token).first();
+  if (!invite) return null;
+  const expected = await inviteHash(env, token, name, password);
+  return (await timingSafeEq(invite.password_hash, expected)) ? invite : null;
+}
+
 function clientIp(request) {
   return request.headers.get("CF-Connecting-IP") || "local";
 }
@@ -185,6 +213,14 @@ async function createSubmission(request, env) {
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return err(400, "Vyplňte prosím platný e-mail.");
   if (!projectName) return err(400, "Vyplňte prosím název projektu.");
 
+  /* zakázka přes klientský odkaz: přístup se ověřuje znovu i tady */
+  let inviteId = null;
+  if (body.inviteToken) {
+    const invite = await checkInvite(env, String(body.inviteToken), String(body.inviteName || ""), String(body.invitePassword || ""));
+    if (!invite) return err(403, "Přístup k odkazu vypršel. Obnovte prosím stránku a přihlaste se znovu.");
+    inviteId = invite.id;
+  }
+
   const date = new Date().toISOString();
   const id = "sub_" + date.slice(0, 10) + "_" + randomId(16);
 
@@ -192,9 +228,9 @@ async function createSubmission(request, env) {
   for (let attempt = 0; attempt < 3; attempt++) {
     try {
       await env.DB.prepare(
-        "INSERT INTO submissions (id, public_reference, client_name, company_name, email, phone, project_name, instructions, created_at, status) " +
-        "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'uploading')"
-      ).bind(id, ref, clientName, companyName || null, email, phone || null, projectName, instructions || null, date).run();
+        "INSERT INTO submissions (id, public_reference, client_name, company_name, email, phone, project_name, instructions, created_at, status, invite_id) " +
+        "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'uploading', ?)"
+      ).bind(id, ref, clientName, companyName || null, email, phone || null, projectName, instructions || null, date, inviteId).run();
       break;
     } catch (e) {
       if (attempt === 2) throw e;
@@ -317,6 +353,57 @@ async function completeSubmission(request, env, id) {
   return json({ publicReference: sub.public_reference });
 }
 
+/* ─── klientské odkazy ─── */
+
+async function verifyInvite(request, env, token) {
+  if (!(await rateLimit(env, "invite", clientIp(request), 10, 900))) {
+    return err(429, "Příliš mnoho pokusů. Zkuste to za 15 minut.");
+  }
+  let body;
+  try { body = await request.json(); } catch { return err(400, "Neplatný požadavek."); }
+  const invite = await checkInvite(env, token, String(body.name || ""), String(body.password || ""));
+  if (!invite) return err(401, "Nesprávné jméno nebo heslo.");
+  return json({ ok: true, clientName: invite.client_name });
+}
+
+async function createInvite(request, env, url) {
+  let body;
+  try { body = await request.json(); } catch { return err(400, "Neplatný požadavek."); }
+  const clientName = String(body.clientName || "").trim().slice(0, 200);
+  const email = String(body.email || "").trim().slice(0, 200);
+  if (!clientName) return err(400, "Vyplňte jméno klienta.");
+  if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return err(400, "Neplatný e-mail.");
+
+  const token = randomId(20);
+  const password = friendlyPassword();
+  const hash = await inviteHash(env, token, clientName, password);
+  await env.DB.prepare(
+    "INSERT INTO invites (id, client_name, email, password_hash, created_at) VALUES (?, ?, ?, ?, ?)"
+  ).bind(token, clientName, email || null, hash, new Date().toISOString()).run();
+
+  return json({
+    token,
+    url: url.origin + "/files/?k=" + token,
+    password,
+    clientName,
+    email: email || null,
+  });
+}
+
+async function listInvites(env) {
+  const rows = (await env.DB.prepare(
+    "SELECT i.id, i.client_name, i.email, i.created_at, " +
+    "(SELECT COUNT(*) FROM submissions s WHERE s.invite_id = i.id) AS submission_count " +
+    "FROM invites i ORDER BY i.created_at DESC LIMIT 200"
+  ).all()).results;
+  return json({ invites: rows });
+}
+
+async function deleteInvite(env, id) {
+  await env.DB.prepare("DELETE FROM invites WHERE id = ?").bind(id).run();
+  return json({ ok: true });
+}
+
 /* ─── admin API ─── */
 
 async function adminLogin(request, env) {
@@ -422,6 +509,8 @@ export default {
       if (m && method === "POST") return uploadFile(request, env, m[1]);
       m = path.match(/^\/api\/submissions\/([^/]+)\/complete$/);
       if (m && method === "POST") return completeSubmission(request, env, m[1]);
+      m = path.match(/^\/api\/invites\/([a-z0-9]{20})\/verify$/);
+      if (m && method === "POST") return verifyInvite(request, env, m[1]);
 
       /* admin stránky */
       if (path === "/admin/files" || path === "/admin/files/") {
@@ -451,6 +540,17 @@ export default {
         }
         m = path.match(/^\/api\/admin\/files\/([a-z0-9]+)\/download$/);
         if (m && method === "GET") return downloadFile(env, m[1], url.searchParams.get("inline") === "1");
+
+        if (path === "/api/admin/invites" && method === "GET") return listInvites(env);
+        if (path === "/api/admin/invites" && method === "POST") {
+          if (!hasCsrfHeader(request)) return err(403, "Chybí bezpečnostní hlavička.");
+          return createInvite(request, env, url);
+        }
+        m = path.match(/^\/api\/admin\/invites\/([a-z0-9]{20})$/);
+        if (m && method === "DELETE") {
+          if (!hasCsrfHeader(request)) return err(403, "Chybí bezpečnostní hlavička.");
+          return deleteInvite(env, m[1]);
+        }
 
         return err(404, "Neznámý endpoint.");
       }
