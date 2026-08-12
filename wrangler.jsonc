@@ -1,6 +1,6 @@
 {
   // Softlab web + klientský portál (/files, /admin/files)
-  "name": "softlab",
+  "name": "softlabdigital",
   "main": "src/worker.js",
   "compatibility_date": "2026-08-01",
   "assets": {
