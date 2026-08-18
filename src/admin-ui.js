@@ -110,6 +110,14 @@ export function adminAppHtml() {
   .actions { display:flex; gap:.75rem; flex-wrap:wrap; margin:1.5rem 0 2rem; align-items:center; }
   .txt-preview { background:var(--ink); color:var(--paper); font-family:ui-monospace,monospace; font-size:.8rem; padding:1rem; white-space:pre-wrap; overflow-wrap:anywhere; max-height:260px; overflow:auto; }
   .status { min-height:1.4em; margin-top:.5rem; }
+  .bar-nav { display:flex; gap:1.25rem; }
+  .bar-nav a { font-weight:600; color:var(--muted); text-decoration:none; }
+  .bar-nav a.active, .bar-nav a:hover { color:var(--ink); }
+  .vault-unlock { max-width:380px; }
+  .vault-unlock label { display:block; font-weight:600; margin-bottom:.5rem; }
+  .vault-toolbar { display:flex; gap:.75rem; flex-wrap:wrap; align-items:center; margin:1.25rem 0; }
+  .vault-editor textarea { width:100%; min-height:320px; font-family:ui-monospace,monospace; font-size:.9rem; padding:1rem; border:2px solid var(--ink); background:var(--paper); border-radius:0; }
+  .vault-editor { margin:1rem 0; }
   .invites { margin-bottom:1.5rem; }
   .invites-panel { border:1px solid var(--line); background:var(--paper2); padding:1.25rem; margin-top:.75rem; }
   .invite-form { display:flex; gap:.75rem; flex-wrap:wrap; }
@@ -125,7 +133,10 @@ export function adminAppHtml() {
 <div class="wrap">
   <header class="bar">
     <a class="logo" href="/">Softlab<sup>®</sup></a>
-    <span class="mono muted">Administrace podkladů</span>
+    <nav class="bar-nav" aria-label="Administrace">
+      <a href="#" data-nav="podklady">Podklady</a>
+      <a href="#/trezor" data-nav="trezor">Trezor</a>
+    </nav>
     <span class="spacer"></span>
     <button class="ghost" id="logoutBtn">Odhlásit</button>
   </header>
@@ -471,10 +482,147 @@ async function downloadAll(sub, files, status, btn) {
   btn.disabled = false;
 }
 
+/* ── trezor ── */
+var vaultKey = null; // jen v paměti, s hlavičkou u každého požadavku
+
+function vaultApi(path, opts) {
+  opts = opts || {};
+  opts.headers = Object.assign({ 'X-Vault-Key': vaultKey }, opts.headers || {});
+  return api(path, opts);
+}
+
+async function renderVault() {
+  app.textContent = '';
+  app.appendChild(el('h1', { text: 'Trezor' }));
+
+  if (!vaultKey) {
+    var form = el('form', { class: 'vault-unlock' });
+    var label = el('label', { for: 'vk', text: 'Heslo trezoru' });
+    var input = el('input', { type: 'password', id: 'vk', autocomplete: 'off', required: '' });
+    var btn = el('button', { text: 'Odemknout', style: 'margin-top:1rem;width:100%' });
+    var errP = el('p', { class: 'error', role: 'alert' });
+    form.appendChild(label); form.appendChild(input); form.appendChild(btn); form.appendChild(errP);
+    form.addEventListener('submit', async function (e) {
+      e.preventDefault();
+      errP.textContent = '';
+      try {
+        vaultKey = input.value;
+        await vaultApi('/api/admin/vault/unlock', { method: 'POST' });
+        renderVault();
+      } catch (e2) { vaultKey = null; errP.textContent = e2.message; }
+    });
+    app.appendChild(el('p', { class: 'muted', text: 'Interní soubory jen pro Softlab. Vyžadují druhé heslo.' }));
+    app.appendChild(form);
+    input.focus();
+    return;
+  }
+
+  var status = el('p', { class: 'status mono', 'aria-live': 'polite' });
+  var listWrap = el('div');
+  var editorWrap = el('div');
+
+  var uploadInput = el('input', { type: 'file', hidden: '' });
+  var uploadBtn = el('button', { text: 'Nahrát soubor', onclick: function () { uploadInput.click(); } });
+  uploadInput.addEventListener('change', async function () {
+    if (!uploadInput.files.length) return;
+    var f = uploadInput.files[0];
+    status.textContent = 'Nahrávám ' + f.name + '…';
+    try {
+      await vaultApi('/api/admin/vault/files/' + encodeURIComponent(f.name), { method: 'PUT', body: f });
+      status.textContent = 'Nahráno: ' + f.name;
+      load();
+    } catch (e) { status.textContent = e.message; }
+    uploadInput.value = '';
+  });
+  var newBtn = el('button', { class: 'ghost', text: 'Nový textový soubor', onclick: async function () {
+    var name = prompt('Název souboru (např. hesla.txt):', 'poznamky.txt');
+    if (!name) return;
+    if (!/\.(txt|md|csv|json)$/i.test(name)) name += '.txt';
+    try {
+      await vaultApi('/api/admin/vault/files/' + encodeURIComponent(name), { method: 'PUT', body: '' });
+      load();
+      openEditor(name);
+    } catch (e) { status.textContent = e.message; }
+  } });
+  var lockBtn = el('button', { class: 'ghost', text: 'Zamknout', onclick: function () { vaultKey = null; renderVault(); } });
+
+  async function openEditor(name) {
+    editorWrap.textContent = '';
+    var res = await fetch('/api/admin/vault/files/' + encodeURIComponent(name) + '?text=1',
+      { headers: { 'X-Vault-Key': vaultKey, 'X-Requested-With': 'fetch' } });
+    if (!res.ok) { status.textContent = 'Soubor se nepodařilo načíst.'; return; }
+    var ta = el('textarea', { spellcheck: 'false' });
+    ta.value = await res.text();
+    var saveBtn = el('button', { text: 'Uložit', onclick: async function () {
+      saveBtn.disabled = true;
+      try {
+        await vaultApi('/api/admin/vault/files/' + encodeURIComponent(name), { method: 'PUT', body: ta.value });
+        status.textContent = 'Uloženo: ' + name + ' (' + new Date().toLocaleTimeString('cs-CZ') + ')';
+        load();
+      } catch (e) { status.textContent = e.message; }
+      saveBtn.disabled = false;
+    } });
+    var closeBtn = el('button', { class: 'ghost', text: 'Zavřít', onclick: function () { editorWrap.textContent = ''; } });
+    editorWrap.appendChild(el('div', { class: 'vault-editor' }, [
+      el('p', {}, [ el('strong', { text: name }) ]), ta,
+      el('div', { class: 'actions' }, [ saveBtn, closeBtn ]) ]));
+    ta.focus();
+  }
+
+  async function downloadFile(name) {
+    var res = await fetch('/api/admin/vault/files/' + encodeURIComponent(name),
+      { headers: { 'X-Vault-Key': vaultKey, 'X-Requested-With': 'fetch' } });
+    if (!res.ok) { status.textContent = 'Stažení se nezdařilo.'; return; }
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(await res.blob());
+    a.download = name;
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(function () { URL.revokeObjectURL(a.href); }, 30000);
+  }
+
+  async function load() {
+    try {
+      var data = await vaultApi('/api/admin/vault/files');
+      listWrap.textContent = '';
+      if (!data.files.length) { listWrap.appendChild(el('p', { class: 'muted', text: 'Trezor je prázdný.' })); return; }
+      data.files.forEach(function (f) {
+        var editable = /\.(txt|md|csv|json)$/i.test(f.name);
+        var row = el('div', { class: 'invite-row' }, [
+          el('div', { class: 'file-info' }, [
+            el('strong', { text: f.name }),
+            el('div', { class: 'muted', text: fmtSize(f.size) + ' · ' + fmtDate(f.uploaded) }) ]),
+          editable ? el('button', { class: 'ghost', text: 'Upravit', onclick: function () { openEditor(f.name); } }) : null,
+          el('button', { class: 'ghost', text: 'Stáhnout', onclick: function () { downloadFile(f.name); } }),
+          el('button', { class: 'danger', text: 'Smazat', onclick: async function () {
+            if (!confirm('Opravdu smazat "' + f.name + '" z trezoru?')) return;
+            try { await vaultApi('/api/admin/vault/files/' + encodeURIComponent(f.name), { method: 'DELETE' }); load(); }
+            catch (e) { status.textContent = e.message; }
+          } }),
+        ]);
+        listWrap.appendChild(row);
+      });
+    } catch (e) {
+      if (e.message === 'Nesprávné heslo trezoru.') { vaultKey = null; renderVault(); return; }
+      status.textContent = e.message;
+    }
+  }
+
+  app.appendChild(el('div', { class: 'vault-toolbar' }, [ uploadBtn, newBtn, lockBtn, uploadInput ]));
+  app.appendChild(status);
+  app.appendChild(editorWrap);
+  app.appendChild(listWrap);
+  load();
+}
+
 /* ── routing ── */
 function route() {
   var h = location.hash.replace(/^#\\/?/, '');
-  if (h) renderDetail(h); else renderList();
+  document.querySelectorAll('.bar-nav a').forEach(function (a) {
+    a.classList.toggle('active', (h === 'trezor') === (a.getAttribute('data-nav') === 'trezor'));
+  });
+  if (h === 'trezor') renderVault();
+  else if (h) renderDetail(h);
+  else renderList();
 }
 window.addEventListener('hashchange', route);
 route();

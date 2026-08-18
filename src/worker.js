@@ -406,21 +406,101 @@ async function deleteInvite(env, id) {
 
 /* ─── admin API ─── */
 
+/* účty: secret ADMIN_USERS = "jmeno:heslo,jmeno:heslo", fallback ADMIN_USER+ADMIN_PASSWORD */
+function adminUsers(env) {
+  const list = [];
+  if (env.ADMIN_USERS) {
+    env.ADMIN_USERS.split(",").forEach((pair) => {
+      const i = pair.indexOf(":");
+      if (i > 0) list.push([pair.slice(0, i).trim(), pair.slice(i + 1).trim()]);
+    });
+  } else if (env.ADMIN_PASSWORD) {
+    list.push([env.ADMIN_USER || "admin", env.ADMIN_PASSWORD]);
+  }
+  return list;
+}
+
 async function adminLogin(request, env) {
   if (!hasCsrfHeader(request)) return err(403, "Chybí bezpečnostní hlavička.");
   if (!(await rateLimit(env, "login", clientIp(request), 5, 900))) {
     return err(429, "Příliš mnoho pokusů o přihlášení. Zkuste to za 15 minut.");
   }
-  if (!env.ADMIN_PASSWORD || !env.SESSION_SECRET) {
-    return err(500, "Administrace není nakonfigurovaná (ADMIN_PASSWORD / SESSION_SECRET).");
+  const users = adminUsers(env);
+  if (!users.length || !env.SESSION_SECRET) {
+    return err(500, "Administrace není nakonfigurovaná (ADMIN_USERS / SESSION_SECRET).");
   }
   let body;
   try { body = await request.json(); } catch { return err(400, "Neplatný požadavek."); }
-  const userOk = await timingSafeEq(String(body.username || ""), env.ADMIN_USER || "admin");
-  const passOk = await timingSafeEq(String(body.password || ""), env.ADMIN_PASSWORD);
-  if (!userOk || !passOk) return err(401, "Nesprávné přihlašovací údaje.");
+  let ok = false;
+  for (const [user, pass] of users) {
+    const userOk = await timingSafeEq(String(body.username || ""), user);
+    const passOk = await timingSafeEq(String(body.password || ""), pass);
+    if (userOk && passOk) ok = true; // projít všechny, ne vyskočit
+  }
+  if (!ok) return err(401, "Nesprávné přihlašovací údaje.");
   const token = await makeSession(env);
   return json({ ok: true }, 200, { "Set-Cookie": sessionCookie(token, SESSION_HOURS * 3600) });
+}
+
+/* ─── trezor: interní soubory, druhé heslo (VAULT_PASSWORD) na každý požadavek ─── */
+
+async function vaultDenied(request, env) {
+  if (!env.VAULT_PASSWORD) return err(500, "Trezor není nakonfigurovaný (VAULT_PASSWORD).");
+  const key = request.headers.get("X-Vault-Key") || "";
+  if (!(await timingSafeEq(key, env.VAULT_PASSWORD))) return err(401, "Nesprávné heslo trezoru.");
+  return null;
+}
+
+function vaultFileName(raw) {
+  let name;
+  try { name = sanitizeName(decodeURIComponent(raw)); } catch { return null; }
+  if (!name || name.includes("..") || name.length > 120) return null;
+  return name;
+}
+
+async function vaultList(env) {
+  const out = [];
+  let cursor;
+  do {
+    const listed = await env.UPLOADS.list({ prefix: "vault/", cursor });
+    listed.objects.forEach((o) => {
+      out.push({ name: o.key.slice(6), size: o.size, uploaded: o.uploaded });
+    });
+    cursor = listed.truncated ? listed.cursor : undefined;
+  } while (cursor);
+  out.sort((a, b) => a.name.localeCompare(b.name, "cs"));
+  return json({ files: out });
+}
+
+async function vaultGet(env, name, asText) {
+  const obj = await env.UPLOADS.get("vault/" + name);
+  if (!obj) return err(404, "Soubor nenalezen.");
+  const ascii = name.replace(/[^\x20-\x7e]/g, "_").replace(/"/g, "'");
+  return new Response(obj.body, {
+    headers: {
+      ...secHeaders(),
+      "Content-Type": asText ? "text/plain; charset=utf-8" : "application/octet-stream",
+      "Content-Disposition": (asText ? "inline" : "attachment") +
+        `; filename="${ascii}"; filename*=UTF-8''${encodeURIComponent(name)}`,
+    },
+  });
+}
+
+async function vaultPut(request, env, name) {
+  const length = parseInt(request.headers.get("Content-Length") || "0", 10);
+  if (length > 25 * 1024 * 1024) {
+    try { if (request.body) await request.body.cancel(); } catch (_) {}
+    return err(413, "Soubor v trezoru může mít max 25 MB.");
+  }
+  await env.UPLOADS.put("vault/" + name, request.body ?? "", {
+    httpMetadata: { contentType: "application/octet-stream" },
+  });
+  return json({ ok: true, name });
+}
+
+async function vaultDelete(env, name) {
+  await env.UPLOADS.delete("vault/" + name);
+  return json({ ok: true });
 }
 
 async function listSubmissions(env, url) {
@@ -540,6 +620,29 @@ export default {
         }
         m = path.match(/^\/api\/admin\/files\/([a-z0-9]+)\/download$/);
         if (m && method === "GET") return downloadFile(env, m[1], url.searchParams.get("inline") === "1");
+
+        /* trezor: kromě session vyžaduje heslo trezoru v hlavičce */
+        if (path === "/api/admin/vault/unlock" && method === "POST") {
+          if (!(await rateLimit(env, "vault", clientIp(request), 5, 900))) {
+            return err(429, "Příliš mnoho pokusů. Zkuste to za 15 minut.");
+          }
+          return (await vaultDenied(request, env)) || json({ ok: true });
+        }
+        if (path.startsWith("/api/admin/vault/")) {
+          const denied = await vaultDenied(request, env);
+          if (denied) return denied;
+          if (path === "/api/admin/vault/files" && method === "GET") return vaultList(env);
+          m = path.match(/^\/api\/admin\/vault\/files\/([^/]+)$/);
+          if (m) {
+            const name = vaultFileName(m[1]);
+            if (!name) return err(400, "Neplatný název souboru.");
+            if (method === "GET") return vaultGet(env, name, url.searchParams.get("text") === "1");
+            if (!hasCsrfHeader(request)) return err(403, "Chybí bezpečnostní hlavička.");
+            if (method === "PUT") return vaultPut(request, env, name);
+            if (method === "DELETE") return vaultDelete(env, name);
+          }
+          return err(404, "Neznámý endpoint.");
+        }
 
         if (path === "/api/admin/invites" && method === "GET") return listInvites(env);
         if (path === "/api/admin/invites" && method === "POST") {
