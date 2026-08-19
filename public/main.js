@@ -267,6 +267,24 @@
         });
       });
 
+      /* Postup: pás karet driftuje doleva, zatímco sekce prochází viewportem
+         (bez pinu, styl madewithgsap) */
+      var pTrack = document.getElementById("processTrack");
+      if (pTrack) {
+        var pDist = function () { return Math.max(0, pTrack.scrollWidth - window.innerWidth); };
+        gsap.to(pTrack, {
+          x: function () { return -pDist(); },
+          ease: "none",
+          scrollTrigger: {
+            trigger: ".process",
+            start: "top bottom",
+            end: "bottom top",
+            scrub: true,
+            invalidateOnRefresh: true
+          }
+        });
+      }
+
       /* Projects: vertical scroll → horizontal pan */
       var track = document.getElementById("workTrack");
       var pin = document.querySelector(".work-pin");
@@ -311,29 +329,6 @@
       );
     }
 
-    /* Postup: sticky čítač 01-04 podle aktivního kroku */
-    var countEl = document.getElementById("processCount");
-    var steps = gsap.utils.toArray(".process-step");
-    if (countEl && steps.length) {
-      steps.forEach(function (step, i) {
-        window.ScrollTrigger.create({
-          trigger: step,
-          start: "top 55%",
-          end: "bottom 55%",
-          onToggle: function (self) {
-            if (!self.isActive) return;
-            steps.forEach(function (s) { s.classList.remove("active"); });
-            step.classList.add("active");
-            var txt = "0" + (i + 1);
-            if (countEl.textContent !== txt) {
-              countEl.textContent = txt;
-              gsap.fromTo(countEl, { yPercent: 14, opacity: 0.2 }, { yPercent: 0, opacity: 1, duration: 0.35, ease: "power2.out" });
-            }
-          }
-        });
-      });
-      steps[0].classList.add("active");
-    }
   }
 
   /* ─── Footer year ─── */

@@ -511,67 +511,54 @@ html.js .loader.done { display: none; }
   .work-card { width: 100%; }
 }
 
-/* ─── Postup (sticky obří čítač 01-04) ─── */
-.process { padding-block: clamp(4rem, 8vw, 7rem); border-top: 1px solid var(--line); }
-.process-grid {
-  display: grid;
-  grid-template-columns: 5fr 7fr;
-  gap: clamp(2rem, 6vw, 6rem);
-  align-items: start;
+/* ─── Postup (horizontální pás karet, scrubem driftuje doleva) ─── */
+.process { padding-block: clamp(4rem, 8vw, 7rem) clamp(5rem, 10vw, 9rem); border-top: 1px solid var(--line); }
+.process-track-wrap {
+  overflow-x: auto; /* mobil a bez JS: nativní swipe */
+  scroll-snap-type: x proximity;
+  scrollbar-width: none;
 }
-.process-count-sticky {
-  position: sticky;
-  top: 22vh;
+.process-track-wrap::-webkit-scrollbar { display: none; }
+.process-track {
+  list-style: none;
   display: flex;
-  align-items: baseline;
-  gap: 0.75rem;
+  gap: clamp(1.25rem, 2.5vw, 2rem);
+  width: max-content;
+  /* první karta zarovnaná na levou hranu .container */
+  padding-inline: max(var(--pad), calc((100vw - 1360px) / 2 + 3rem));
+  will-change: transform;
 }
-.process-count {
-  font-size: clamp(7rem, 17vw, 15rem);
-  font-weight: 850;
-  font-stretch: 120%;
-  line-height: 0.8;
-  color: var(--accent);
-  display: inline-block;
-}
-.process-count-total {
-  font-family: var(--font-mono);
-  font-size: 1rem;
-  color: var(--muted);
-}
-.process-steps { list-style: none; }
-.process-step {
-  min-height: 58vh;
+.process-card {
+  width: min(78vw, 420px);
+  min-height: 340px;
+  flex-shrink: 0;
+  scroll-snap-align: start;
+  background: var(--paper-2);
+  border: 1px solid var(--ink);
+  padding: clamp(1.5rem, 2.5vw, 2.25rem);
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  border-top: 1px solid var(--line);
-  padding-block: 2rem;
+  justify-content: space-between;
+  gap: 2.5rem;
 }
-.process-index {
-  font-family: var(--font-mono);
-  font-size: 0.8rem;
+.process-num {
+  font-size: clamp(3.2rem, 5vw, 4.5rem);
+  font-weight: 850;
+  font-stretch: 120%;
+  line-height: 0.85;
   color: var(--accent);
-  display: none;
 }
-.process-step h3 {
-  font-size: clamp(1.9rem, 3.4vw, 3rem);
+.process-card h3 {
+  font-size: clamp(1.4rem, 2.2vw, 1.8rem);
   font-weight: 800;
   font-stretch: 115%;
   text-transform: uppercase;
+  margin-bottom: 0.6rem;
 }
-.process-step p { color: var(--muted); margin-top: 0.8rem; max-width: 44ch; font-size: 1.1rem; }
-
-/* kroky se ztlumí a rozsvěcí podle pozice scrollu (JS přidává .active) */
-@media (min-width: 901px) and (prefers-reduced-motion: no-preference) {
-  html.js .process-step { opacity: 0.3; transition: opacity 0.4s var(--ease-out); }
-  html.js .process-step.active { opacity: 1; }
-}
-@media (max-width: 900px) {
-  .process-grid { grid-template-columns: 1fr; }
-  .process-count-col { display: none; }
-  .process-step { min-height: 0; }
-  .process-index { display: block; margin-bottom: 0.5rem; }
+.process-card p { color: var(--muted); }
+@media (min-width: 1024px) and (prefers-reduced-motion: no-preference) {
+  /* na desktopu posouvá pás GSAP, ne uživatel */
+  html.js .process-track-wrap { overflow: hidden; }
 }
 
 /* ─── Reference ─── */
