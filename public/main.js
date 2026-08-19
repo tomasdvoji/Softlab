@@ -153,6 +153,25 @@
     if (fn) el.innerHTML = fn(ART.prng(seed));
   });
 
+  /* ─── Obloukové titulky karet postupu (dekorace, statická) ─── */
+  document.querySelectorAll(".pc-title").forEach(function (t) {
+    var text = t.textContent;
+    t.setAttribute("aria-label", text);
+    t.textContent = "";
+    var wrap = document.createElement("span");
+    wrap.setAttribute("aria-hidden", "true");
+    var n = text.length;
+    for (var i = 0; i < n; i++) {
+      var s = document.createElement("span");
+      s.textContent = text[i];
+      var c = i - (n - 1) / 2;
+      s.style.display = "inline-block";
+      s.style.transform = "rotate(" + (c * 5) + "deg) translateY(" + (c * c * 1.5) + "px)";
+      wrap.appendChild(s);
+    }
+    t.appendChild(wrap);
+  });
+
   /* ─── Nav: paper background after scroll ─── */
   var nav = document.getElementById("nav");
   var onScroll = function () {
@@ -267,21 +286,27 @@
         });
       });
 
-      /* Postup: pás karet driftuje doleva, zatímco sekce prochází viewportem
-         (bez pinu, styl madewithgsap) */
-      var pTrack = document.getElementById("processTrack");
-      if (pTrack) {
-        var pDist = function () { return Math.max(0, pTrack.scrollWidth - window.innerWidth); };
-        gsap.to(pTrack, {
-          x: function () { return -pDist(); },
-          ease: "none",
-          scrollTrigger: {
-            trigger: ".process",
-            start: "top bottom",
-            end: "bottom top",
-            scrub: true,
-            invalidateOnRefresh: true
-          }
+      /* Postup: balíček karet se scrubem rozdá do vějíře (styl madewithgsap) */
+      var deck = document.getElementById("processDeck");
+      if (deck) {
+        var deckCards = gsap.utils.toArray(".process-card");
+        var half = (deckCards.length - 1) / 2;
+        deckCards.forEach(function (card, i) {
+          var c = i - half; // -1.5 .. 1.5
+          gsap.set(card, { rotate: c * 3, zIndex: i + 1 });
+          gsap.to(card, {
+            x: c * 245,
+            y: c * c * 24,
+            rotate: c * 11,
+            ease: "none",
+            scrollTrigger: {
+              trigger: ".process-deck-wrap",
+              start: "top 80%",
+              end: "center 55%",
+              scrub: 1,
+              invalidateOnRefresh: true
+            }
+          });
         });
       }
 
@@ -305,24 +330,24 @@
       }
     });
 
-    /* Statement: word-by-word scrub (bílá slova na inku) */
-    var statement = document.getElementById("statementText");
-    if (statement) {
-      var words = statement.textContent.trim().split(/\s+/);
-      statement.innerHTML = words
+    /* Manifesto: word-by-word scrub */
+    var manifesto = document.getElementById("manifestoText");
+    if (manifesto) {
+      var words = manifesto.textContent.trim().split(/\s+/);
+      manifesto.innerHTML = words
         .map(function (word) { return '<span class="word">' + word + "</span>"; })
         .join(" ");
       gsap.fromTo(
-        statement.querySelectorAll(".word"),
-        { opacity: 0.14 },
+        manifesto.querySelectorAll(".word"),
+        { opacity: 0.12 },
         {
           opacity: 1,
           stagger: 0.06,
           ease: "none",
           scrollTrigger: {
-            trigger: statement,
-            start: "top 70%",
-            end: "bottom 55%",
+            trigger: manifesto,
+            start: "top 78%",
+            end: "bottom 45%",
             scrub: true
           }
         }

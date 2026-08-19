@@ -335,25 +335,17 @@ html.js .loader.done { display: none; }
   .line-right { text-align: left; }
 }
 
-/* ─── Statement (inkový blok, bílé verzálky přes celý viewport) ─── */
-.statement {
-  background: var(--ink);
-  min-height: 92vh;
-  display: grid;
-  place-items: center;
-  padding: clamp(4rem, 10vw, 8rem) var(--pad);
-}
-.statement-text {
-  color: var(--paper);
-  text-align: center;
-  font-size: clamp(2.1rem, 6.4vw, 5.6rem);
-  font-weight: 850;
-  font-stretch: 112%;
+/* ─── Manifest ─── */
+.manifesto { padding-block: clamp(6rem, 14vw, 12rem); }
+.manifesto-text {
+  font-size: clamp(1.9rem, 4.6vw, 3.8rem);
+  font-weight: 700;
+  font-stretch: 108%;
   letter-spacing: -0.02em;
-  line-height: 1.06;
-  max-width: 16ch;
+  line-height: 1.15;
+  max-width: 26ch;
 }
-.statement-text .word { display: inline-block; }
+.manifesto-text .word { display: inline-block; }
 
 /* ─── Velocity pás (rychlost scrollu žene marquee) ─── */
 .velocity {
@@ -511,54 +503,79 @@ html.js .loader.done { display: none; }
   .work-card { width: 100%; }
 }
 
-/* ─── Postup (horizontální pás karet, scrubem driftuje doleva) ─── */
-.process { padding-block: clamp(4rem, 8vw, 7rem) clamp(5rem, 10vw, 9rem); border-top: 1px solid var(--line); }
-.process-track-wrap {
-  overflow-x: auto; /* mobil a bez JS: nativní swipe */
-  scroll-snap-type: x proximity;
-  scrollbar-width: none;
+/* ─── Postup (rozdaný vějíř karet na inku, dle madewithgsap) ─── */
+.process {
+  background: var(--ink);
+  padding-block: clamp(4rem, 8vw, 7rem) clamp(5rem, 10vw, 9rem);
+  overflow: hidden;
 }
-.process-track-wrap::-webkit-scrollbar { display: none; }
-.process-track {
+.process .section-title { color: var(--paper); }
+.process-intro {
+  color: #b3b1a8;
+  font-size: clamp(1.15rem, 1.8vw, 1.5rem);
+  max-width: 40ch;
+  margin-top: -1.5rem;
+}
+.process-deck-wrap { position: relative; margin-top: clamp(2.5rem, 5vw, 4rem); }
+.process-deck {
   list-style: none;
-  display: flex;
-  gap: clamp(1.25rem, 2.5vw, 2rem);
-  width: max-content;
-  /* první karta zarovnaná na levou hranu .container */
-  padding-inline: max(var(--pad), calc((100vw - 1360px) / 2 + 3rem));
-  will-change: transform;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.25rem;
+  max-width: 1360px;
+  margin-inline: auto;
+  padding-inline: var(--pad);
 }
 .process-card {
-  width: min(78vw, 420px);
-  min-height: 340px;
-  flex-shrink: 0;
-  scroll-snap-align: start;
-  background: var(--paper-2);
-  border: 1px solid var(--ink);
-  padding: clamp(1.5rem, 2.5vw, 2.25rem);
+  /* hrací karty jsou jediný zaoblený prvek webu - záměr metafory balíčku */
+  border-radius: 20px;
+  min-height: 460px;
+  padding: 2rem 1.75rem;
   display: flex;
   flex-direction: column;
+  align-items: center;
   justify-content: space-between;
-  gap: 2.5rem;
+  text-align: center;
+  gap: 1rem;
 }
-.process-num {
-  font-size: clamp(3.2rem, 5vw, 4.5rem);
-  font-weight: 850;
-  font-stretch: 120%;
-  line-height: 0.85;
-  color: var(--accent);
-}
-.process-card h3 {
-  font-size: clamp(1.4rem, 2.2vw, 1.8rem);
+.pc-title {
+  font-size: clamp(1.5rem, 2.2vw, 1.9rem);
   font-weight: 800;
   font-stretch: 115%;
   text-transform: uppercase;
-  margin-bottom: 0.6rem;
+  line-height: 1;
+  padding-top: 0.75rem;
 }
-.process-card p { color: var(--muted); }
+.pc-title span { display: inline-block; }
+.pc-num {
+  font-size: clamp(6rem, 9vw, 8.5rem);
+  font-weight: 850;
+  font-stretch: 120%;
+  line-height: 0.8;
+  opacity: 0.22;
+}
+.process-card p { font-size: 0.98rem; max-width: 30ch; }
+.pc-1 { background: var(--paper-2); color: var(--ink); }
+.pc-2 { background: var(--accent); color: var(--paper); }
+.pc-3 { background: var(--paper); color: var(--ink); }
+.pc-4 { background: var(--ink); color: var(--paper); border: 1px solid rgba(242, 240, 234, 0.4); }
+.pc-1 p, .pc-3 p { color: var(--muted); }
+.pc-2 p, .pc-4 p { color: rgba(242, 240, 234, 0.75); }
+
+/* desktop: karty v balíčku uprostřed, GSAP je rozdá do vějíře */
 @media (min-width: 1024px) and (prefers-reduced-motion: no-preference) {
-  /* na desktopu posouvá pás GSAP, ne uživatel */
-  html.js .process-track-wrap { overflow: hidden; }
+  html.js .process-deck-wrap { min-height: 620px; }
+  html.js .process-deck { display: block; padding: 0; }
+  html.js .process-card {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 330px;
+    height: 470px;
+    min-height: 0;
+    margin: -235px 0 0 -165px;
+    box-shadow: 0 18px 60px rgba(0, 0, 0, 0.35);
+  }
 }
 
 /* ─── Reference ─── */
