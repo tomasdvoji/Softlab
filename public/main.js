@@ -286,36 +286,9 @@
         });
       });
 
-      /* Postup: sekce se připne a balíček se během scrollu rozdá do vějíře,
-         karta po kartě (styl madewithgsap) */
-      var deck = document.getElementById("processDeck");
-      if (deck) {
-        var deckCards = gsap.utils.toArray(".process-card");
-        var half = (deckCards.length - 1) / 2;
-        var dealTl = gsap.timeline({
-          scrollTrigger: {
-            trigger: ".process",
-            start: "top top",
-            end: "+=140%",
-            pin: true,
-            scrub: 1,
-            invalidateOnRefresh: true
-          }
-        });
-        deckCards.forEach(function (card, i) {
-          var c = i - half; // -1.5 .. 1.5
-          gsap.set(card, { rotate: c * 3, zIndex: i + 1 });
-          dealTl.to(card, {
-            x: c * 260,
-            y: c * c * 26,
-            rotate: c * 12,
-            ease: "power1.inOut",
-            duration: 1
-          }, i * 0.18);
-        });
-      }
-
-      /* Projects: vertical scroll → horizontal pan */
+      /* Projects: vertical scroll → horizontal pan
+         (piny se musí vytvářet v pořadí, v jakém jsou sekce na stránce,
+         jinak si ScrollTrigger špatně spočítá pozice) */
       var track = document.getElementById("workTrack");
       var pin = document.querySelector(".work-pin");
       if (track && pin) {
@@ -329,8 +302,39 @@
             end: function () { return "+=" + distance(); },
             pin: true,
             scrub: 1,
+            anticipatePin: 1,
             invalidateOnRefresh: true
           }
+        });
+      }
+
+      /* Postup: sekce se připne a balíček se během scrollu rozdá do vějíře,
+         karta po kartě (styl madewithgsap) */
+      var deck = document.getElementById("processDeck");
+      if (deck) {
+        var deckCards = gsap.utils.toArray(".process-card");
+        var half = (deckCards.length - 1) / 2;
+        var dealTl = gsap.timeline({
+          scrollTrigger: {
+            trigger: ".process",
+            start: "top top",
+            end: "+=140%",
+            pin: true,
+            scrub: 1,
+            anticipatePin: 1,
+            invalidateOnRefresh: true
+          }
+        });
+        deckCards.forEach(function (card, i) {
+          var c = i - half; // -1.5 .. 1.5
+          gsap.set(card, { rotate: c * 3, zIndex: i + 1 });
+          dealTl.to(card, {
+            x: c * 260,
+            y: c * c * 26,
+            rotate: c * 12,
+            ease: "power1.inOut",
+            duration: 1
+          }, i * 0.18);
         });
       }
     });
