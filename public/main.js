@@ -153,67 +153,6 @@
     if (fn) el.innerHTML = fn(ART.prng(seed));
   });
 
-  /* ─── Hřiště: název firmy → blueprint systému ─── */
-  (function playground() {
-    var input = document.getElementById("pgInput");
-    var canvas = document.getElementById("pgCanvas");
-    if (!input || !canvas) return;
-
-    var MODULES = ["WEB", "E-SHOP", "CRM", "SKLAD", "FAKTURACE", "PLÁNOVÁNÍ", "REPORTY", "API", "OBJEDNÁVKY", "DOCHÁZKA"];
-    var SLOTS = [
-      [190, 120], [600, 90], [1010, 120],
-      [150, 330], [1050, 330],
-      [190, 540], [600, 570], [1010, 540]
-    ];
-
-    function esc(t) {
-      return t.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
-    }
-
-    function hash(t) {
-      var h = 5381;
-      for (var i = 0; i < t.length; i++) h = ((h << 5) + h + t.charCodeAt(i)) >>> 0;
-      return h;
-    }
-
-    function render() {
-      var name = input.value.trim() || "Vaše firma";
-      var display = esc(name.toUpperCase().slice(0, 24));
-      var r = ART.prng(hash(name.toLowerCase()));
-      var count = 4 + Math.floor(r() * 4);
-      var cx = 600, cy = 330;
-      var order = SLOTS.slice();
-      for (var i = order.length - 1; i > 0; i--) {
-        var j = Math.floor(r() * (i + 1));
-        var tmp = order[i]; order[i] = order[j]; order[j] = tmp;
-      }
-      var accentIdx = Math.floor(r() * count);
-      var s = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 660" aria-hidden="true">';
-      var boxW = 176, boxH = 64;
-      for (var k = 0; k < count; k++) {
-        var mx = order[k][0] + (r() * 30 - 15);
-        var my = order[k][1] + (r() * 24 - 12);
-        var label = MODULES[Math.floor(r() * MODULES.length * 0.999)];
-        var accent = k === accentIdx;
-        var stroke = accent ? "var(--accent)" : "var(--ink)";
-        /* ortogonální spoj do středu */
-        s += '<path d="M' + mx + " " + my + " H" + cx + " V" + cy + '" fill="none" stroke="' + stroke + '" stroke-width="' + (accent ? 3.5 : 2) + '"/>';
-        s += '<rect x="' + (mx - boxW / 2) + '" y="' + (my - boxH / 2) + '" width="' + boxW + '" height="' + boxH + '" fill="var(--paper)" stroke="' + stroke + '" stroke-width="' + (accent ? 3.5 : 2) + '"/>';
-        s += '<text x="' + mx + '" y="' + (my + 5) + '" text-anchor="middle" font-size="17" fill="' + (accent ? "var(--accent)" : "var(--ink)") + '">' + label + "</text>";
-      }
-      /* centrální uzel s názvem firmy */
-      var nw = Math.max(300, display.length * 15 + 90);
-      s += '<rect x="' + (cx - nw / 2) + '" y="' + (cy - 52) + '" width="' + nw + '" height="104" fill="var(--ink)"/>';
-      s += '<text x="' + cx + '" y="' + (cy - 6) + '" text-anchor="middle" font-size="22" font-weight="600" fill="var(--paper)">' + display + "</text>";
-      s += '<text x="' + cx + '" y="' + (cy + 26) + '" text-anchor="middle" font-size="13" fill="var(--accent-soft, #8f97ff)">SYSTÉM NA MÍRU</text>';
-      s += "</svg>";
-      canvas.innerHTML = s;
-    }
-
-    input.addEventListener("input", render);
-    render();
-  })();
-
   /* ─── Nav: paper background after scroll ─── */
   var nav = document.getElementById("nav");
   var onScroll = function () {
@@ -348,28 +287,52 @@
       }
     });
 
-    /* Manifesto: word-by-word scrub */
-    var manifesto = document.getElementById("manifestoText");
-    if (manifesto) {
-      var words = manifesto.textContent.trim().split(/\s+/);
-      manifesto.innerHTML = words
+    /* Statement: word-by-word scrub (bílá slova na inku) */
+    var statement = document.getElementById("statementText");
+    if (statement) {
+      var words = statement.textContent.trim().split(/\s+/);
+      statement.innerHTML = words
         .map(function (word) { return '<span class="word">' + word + "</span>"; })
         .join(" ");
       gsap.fromTo(
-        manifesto.querySelectorAll(".word"),
-        { opacity: 0.12 },
+        statement.querySelectorAll(".word"),
+        { opacity: 0.14 },
         {
           opacity: 1,
           stagger: 0.06,
           ease: "none",
           scrollTrigger: {
-            trigger: manifesto,
-            start: "top 78%",
-            end: "bottom 45%",
+            trigger: statement,
+            start: "top 70%",
+            end: "bottom 55%",
             scrub: true
           }
         }
       );
+    }
+
+    /* Postup: sticky čítač 01-04 podle aktivního kroku */
+    var countEl = document.getElementById("processCount");
+    var steps = gsap.utils.toArray(".process-step");
+    if (countEl && steps.length) {
+      steps.forEach(function (step, i) {
+        window.ScrollTrigger.create({
+          trigger: step,
+          start: "top 55%",
+          end: "bottom 55%",
+          onToggle: function (self) {
+            if (!self.isActive) return;
+            steps.forEach(function (s) { s.classList.remove("active"); });
+            step.classList.add("active");
+            var txt = "0" + (i + 1);
+            if (countEl.textContent !== txt) {
+              countEl.textContent = txt;
+              gsap.fromTo(countEl, { yPercent: 14, opacity: 0.2 }, { yPercent: 0, opacity: 1, duration: 0.35, ease: "power2.out" });
+            }
+          }
+        });
+      });
+      steps[0].classList.add("active");
     }
   }
 
