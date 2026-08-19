@@ -286,27 +286,32 @@
         });
       });
 
-      /* Postup: balíček karet se scrubem rozdá do vějíře (styl madewithgsap) */
+      /* Postup: sekce se připne a balíček se během scrollu rozdá do vějíře,
+         karta po kartě (styl madewithgsap) */
       var deck = document.getElementById("processDeck");
       if (deck) {
         var deckCards = gsap.utils.toArray(".process-card");
         var half = (deckCards.length - 1) / 2;
+        var dealTl = gsap.timeline({
+          scrollTrigger: {
+            trigger: ".process",
+            start: "top top",
+            end: "+=140%",
+            pin: true,
+            scrub: 1,
+            invalidateOnRefresh: true
+          }
+        });
         deckCards.forEach(function (card, i) {
           var c = i - half; // -1.5 .. 1.5
           gsap.set(card, { rotate: c * 3, zIndex: i + 1 });
-          gsap.to(card, {
-            x: c * 245,
-            y: c * c * 24,
-            rotate: c * 11,
-            ease: "none",
-            scrollTrigger: {
-              trigger: ".process-deck-wrap",
-              start: "top 80%",
-              end: "center 55%",
-              scrub: 1,
-              invalidateOnRefresh: true
-            }
-          });
+          dealTl.to(card, {
+            x: c * 260,
+            y: c * c * 26,
+            rotate: c * 12,
+            ease: "power1.inOut",
+            duration: 1
+          }, i * 0.18);
         });
       }
 

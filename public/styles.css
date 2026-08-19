@@ -562,9 +562,16 @@ html.js .loader.done { display: none; }
 .pc-1 p, .pc-3 p { color: var(--muted); }
 .pc-2 p, .pc-4 p { color: rgba(242, 240, 234, 0.75); }
 
-/* desktop: karty v balíčku uprostřed, GSAP je rozdá do vějíře */
+/* desktop: sekce se pinne na výšku viewportu, GSAP rozdává karty */
 @media (min-width: 1024px) and (prefers-reduced-motion: no-preference) {
-  html.js .process-deck-wrap { min-height: 620px; }
+  html.js .process {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding-block: 4rem 3rem;
+  }
+  html.js .process-deck-wrap { min-height: 560px; flex: 1; }
   html.js .process-deck { display: block; padding: 0; }
   html.js .process-card {
     position: absolute;
