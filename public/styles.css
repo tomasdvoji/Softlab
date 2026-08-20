@@ -614,24 +614,48 @@ html.js .loader.done { display: none; }
 .footer-cta {
   padding-block: clamp(5rem, 11vw, 10rem) clamp(4rem, 8vw, 7rem);
 }
-.footer-title {
-  font-size: clamp(3.2rem, 11vw, 11rem);
+/* ─── CTA přejezd: obří text jede přes připnutou sekci ─── */
+.cta-pan {
+  padding-block: clamp(4rem, 10vw, 8rem);
+  overflow: hidden;
+}
+.cta-pan-line {
   font-weight: 850;
-  font-stretch: 120%;
+  font-stretch: 118%;
   text-transform: uppercase;
-  letter-spacing: -0.015em;
-  line-height: 0.98;
+  letter-spacing: -0.02em;
+  line-height: 1;
+  color: var(--ink);
+  text-align: center;
+  font-size: clamp(2.6rem, 12vw, 6rem);
 }
-.roll-line { display: block; }
-/* roll efekt: každý znak dvakrát, dvojče přesně o řádek níž;
-   znak se odroluje o -100 % a dvojče doskočí na jeho místo */
-.footer-title .rl-ch { display: inline-block; position: relative; }
-.footer-title .rl-ch span { display: block; }
-.footer-title .rl-ch span + span {
-  position: absolute;
-  top: 100%;
-  left: 0;
+.cta-pan-line .cp-ch { display: inline-block; will-change: transform; }
+@media (min-width: 1024px) and (prefers-reduced-motion: no-preference) {
+  html.js .cta-pan {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    padding-block: 0;
+  }
+  html.js .cta-pan-line {
+    white-space: nowrap;
+    font-size: min(34vh, 24vw);
+    text-align: left;
+    will-change: transform;
+  }
 }
+
+/* ─── zvlněná hrana do patičky ─── */
+.footer-curve {
+  background: var(--paper);
+  line-height: 0;
+}
+.footer-curve svg {
+  display: block;
+  width: 100%;
+  height: clamp(70px, 13vw, 160px);
+}
+.footer-curve path { fill: var(--ink); }
 .sr-only {
   position: absolute;
   width: 1px;

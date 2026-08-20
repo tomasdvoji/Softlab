@@ -172,6 +172,27 @@
     t.appendChild(wrap);
   });
 
+  /* ─── CTA přejezd: rozsekat na znaky s hravým natočením ─── */
+  (function splitPan() {
+    var el = document.getElementById("ctaPanText");
+    if (!el) return;
+    var text = el.textContent;
+    el.textContent = "";
+    for (var i = 0; i < text.length; i++) {
+      if (text[i] === " ") {
+        el.appendChild(document.createTextNode(" "));
+        continue;
+      }
+      var s = document.createElement("span");
+      s.className = "cp-ch";
+      s.textContent = text[i];
+      var r = (i % 2 ? 1 : -1) * (2 + ((i * 5) % 5));
+      var y = ((i % 3) - 1) * 0.045;
+      s.style.transform = "rotate(" + r + "deg) translateY(" + y + "em)";
+      el.appendChild(s);
+    }
+  })();
+
   /* ─── Nav: paper background after scroll ─── */
   var nav = document.getElementById("nav");
   var onScroll = function () {
@@ -341,6 +362,27 @@
           }, i * 0.18);
         });
       }
+
+      /* CTA: obří "Máte projekt?" přejede připnutou sekcí zprava doleva */
+      var panText = document.getElementById("ctaPanText");
+      var panSec = document.querySelector(".cta-pan");
+      if (panText && panSec) {
+        gsap.fromTo(panText,
+          { x: function () { return window.innerWidth * 0.9; } },
+          {
+            x: function () { return -(panText.scrollWidth + window.innerWidth * 0.1); },
+            ease: "none",
+            scrollTrigger: {
+              trigger: panSec,
+              start: "top top",
+              end: function () { return "+=" + Math.round(panText.scrollWidth * 0.8); },
+              pin: true,
+              scrub: 1,
+              anticipatePin: 1,
+              invalidateOnRefresh: true
+            }
+          });
+      }
     });
 
     /* Manifesto: word-by-word scrub */
@@ -367,41 +409,15 @@
       );
     }
 
-    /* Footer: "Máte projekt?" - znaky se odrolují s rotační vlnou
-       (dvojče znaku doskočí na místo, pak tichý reset na 0) */
-    var ft = document.getElementById("footerTitle");
-    if (ft) {
-      var rollChars = [];
-      ft.querySelectorAll(".roll-line").forEach(function (line) {
-        var txt = line.textContent;
-        line.textContent = "";
-        for (var ci = 0; ci < txt.length; ci++) {
-          var ch = document.createElement("span");
-          ch.className = "rl-ch";
-          var copyA = document.createElement("span");
-          copyA.textContent = txt[ci];
-          var copyB = document.createElement("span");
-          copyB.textContent = txt[ci];
-          ch.appendChild(copyA);
-          ch.appendChild(copyB);
-          line.appendChild(ch);
-          rollChars.push(ch);
-        }
-      });
-      var rollTl = gsap.timeline({
-        scrollTrigger: { trigger: ft, start: "top 80%", once: true },
-        onComplete: function () { gsap.set(rollChars, { yPercent: 0, rotation: 0 }); }
-      });
-      rollChars.forEach(function (ch, i) {
-        var pos = i * 0.05;
-        rollTl.to(ch, { yPercent: -100, duration: 0.9, ease: "power2.inOut" }, pos);
-        rollTl.to(ch, {
-          rotation: (i % 2 ? 1 : -1) * (10 + (i % 3) * 4),
-          duration: 0.45,
-          yoyo: true,
-          repeat: 1,
-          ease: "sine.inOut"
-        }, pos);
+    /* Zvlněná hrana footeru: prohnutí linky roste s rychlostí scrollu */
+    var curvePath = document.getElementById("footerCurvePath");
+    if (curvePath) {
+      var sag = 60;
+      gsap.ticker.add(function () {
+        var cv = lenis ? Math.abs(lenis.velocity || 0) : 0;
+        var sagTarget = 60 + Math.min(90, cv * 0.9);
+        sag += (sagTarget - sag) * 0.08;
+        curvePath.setAttribute("d", "M0,160 L0,40 Q720," + (40 + sag).toFixed(1) + " 1440,40 L1440,160 Z");
       });
     }
 
