@@ -117,6 +117,8 @@ html.js .loader.done { display: none; }
   margin-bottom: clamp(2.5rem, 5vw, 4.5rem);
 }
 .mask-title { overflow: hidden; padding-block: 0.14em; margin-block: -0.14em; }
+/* margin-block výše by jinak zrušil spodní odsazení titulku */
+.section-title.mask-title { margin-bottom: calc(clamp(2.5rem, 5vw, 4.5rem) - 0.14em); }
 .mt-inner { display: inline-block; }
 
 /* podtržený odkaz s animovanou linkou */
@@ -620,12 +622,26 @@ html.js .loader.done { display: none; }
   letter-spacing: -0.015em;
   line-height: 0.98;
 }
-.footer-title .outline {
-  color: transparent;
-  -webkit-text-stroke: 3px var(--paper);
+.roll-line { display: block; }
+/* roll efekt: každý znak dvakrát, dvojče přesně o řádek níž;
+   znak se odroluje o -100 % a dvojče doskočí na jeho místo */
+.footer-title .rl-ch { display: inline-block; position: relative; }
+.footer-title .rl-ch span { display: block; }
+.footer-title .rl-ch span + span {
+  position: absolute;
+  top: 100%;
+  left: 0;
 }
-@supports not (-webkit-text-stroke: 3px black) {
-  .footer-title .outline { color: var(--paper); }
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
 }
 .footer-sub {
   margin-top: 2rem;

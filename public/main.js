@@ -325,13 +325,17 @@
             invalidateOnRefresh: true
           }
         });
+        /* rozestup podle šířky okna, aby texty karet zůstaly čitelné */
+        var spread = function () {
+          return Math.min(330, Math.max(230, (window.innerWidth - 380) / 3));
+        };
         deckCards.forEach(function (card, i) {
           var c = i - half; // -1.5 .. 1.5
           gsap.set(card, { rotate: c * 3, zIndex: i + 1 });
           dealTl.to(card, {
-            x: c * 260,
-            y: c * c * 26,
-            rotate: c * 12,
+            x: function () { return c * spread(); },
+            y: c * c * 18,
+            rotate: c * 8,
             ease: "power1.inOut",
             duration: 1
           }, i * 0.18);
@@ -361,6 +365,44 @@
           }
         }
       );
+    }
+
+    /* Footer: "Máte projekt?" - znaky se odrolují s rotační vlnou
+       (dvojče znaku doskočí na místo, pak tichý reset na 0) */
+    var ft = document.getElementById("footerTitle");
+    if (ft) {
+      var rollChars = [];
+      ft.querySelectorAll(".roll-line").forEach(function (line) {
+        var txt = line.textContent;
+        line.textContent = "";
+        for (var ci = 0; ci < txt.length; ci++) {
+          var ch = document.createElement("span");
+          ch.className = "rl-ch";
+          var copyA = document.createElement("span");
+          copyA.textContent = txt[ci];
+          var copyB = document.createElement("span");
+          copyB.textContent = txt[ci];
+          ch.appendChild(copyA);
+          ch.appendChild(copyB);
+          line.appendChild(ch);
+          rollChars.push(ch);
+        }
+      });
+      var rollTl = gsap.timeline({
+        scrollTrigger: { trigger: ft, start: "top 80%", once: true },
+        onComplete: function () { gsap.set(rollChars, { yPercent: 0, rotation: 0 }); }
+      });
+      rollChars.forEach(function (ch, i) {
+        var pos = i * 0.05;
+        rollTl.to(ch, { yPercent: -100, duration: 0.9, ease: "power2.inOut" }, pos);
+        rollTl.to(ch, {
+          rotation: (i % 2 ? 1 : -1) * (10 + (i % 3) * 4),
+          duration: 0.45,
+          yoyo: true,
+          repeat: 1,
+          ease: "sine.inOut"
+        }, pos);
+      });
     }
 
   }
