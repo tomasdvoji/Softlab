@@ -409,15 +409,25 @@
       );
     }
 
-    /* Zvlněná hrana footeru: prohnutí linky roste s rychlostí scrollu */
+    /* Hrana footeru: při scrollu dolů se černá vyboulí nahoru a postupně
+       vyplní celou hranu; scrub jede reverzibilně oběma směry */
     var curvePath = document.getElementById("footerCurvePath");
     if (curvePath) {
-      var sag = 60;
-      gsap.ticker.add(function () {
-        var cv = lenis ? Math.abs(lenis.velocity || 0) : 0;
-        var sagTarget = 60 + Math.min(90, cv * 0.9);
-        sag += (sagTarget - sag) * 0.08;
-        curvePath.setAttribute("d", "M0,160 L0,40 Q720," + (40 + sag).toFixed(1) + " 1440,40 L1440,160 Z");
+      var drawCurve = function (p) {
+        var edge = 160 * (1 - p);              // okraje stoupají zdola nahoru
+        var arc = 130 * Math.sin(p * Math.PI); // vyboulení: největší v půlce, 0 na koncích
+        curvePath.setAttribute("d",
+          "M0,160 L0," + edge.toFixed(1) +
+          " Q720," + (edge - arc).toFixed(1) +
+          " 1440," + edge.toFixed(1) + " L1440,160 Z");
+      };
+      drawCurve(0);
+      window.ScrollTrigger.create({
+        trigger: ".footer-curve",
+        start: "top bottom",
+        end: "top 15%",
+        scrub: true,
+        onUpdate: function (self) { drawCurve(self.progress); }
       });
     }
 
