@@ -14,7 +14,14 @@
   /* ─── Smooth scroll (Lenis) ─── */
   var lenis;
   if (!reduceMotion && typeof window.Lenis !== "undefined" && hasGsap) {
-    lenis = new window.Lenis({ anchors: { offset: -84 } });
+    lenis = new window.Lenis({
+      anchors: {
+        offset: -84,
+        /* klidný sjezd na kotvy místo skoku - 2 s s ease-in-out */
+        duration: 2,
+        easing: function (t) { return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2; }
+      }
+    });
     lenis.on("scroll", window.ScrollTrigger.update);
     window.gsap.ticker.add(function (time) { lenis.raf(time * 1000); });
     window.gsap.ticker.lagSmoothing(0);
