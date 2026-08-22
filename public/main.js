@@ -336,61 +336,63 @@
         });
       }
 
-      /* Postup: sekce se připne a balíček se během scrollu rozdá do vějíře,
-         karta po kartě (styl madewithgsap) */
+    });
+
+    /* Od tabletu výš: balíček karet se připne a scrubem rozdá do vějíře */
+    mm.add("(min-width: 768px)", function () {
       var deck = document.getElementById("processDeck");
-      if (deck) {
-        var deckCards = gsap.utils.toArray(".process-card");
-        var half = (deckCards.length - 1) / 2;
-        var dealTl = gsap.timeline({
+      if (!deck) return;
+      var deckCards = gsap.utils.toArray(".process-card");
+      var half = (deckCards.length - 1) / 2;
+      var dealTl = gsap.timeline({
+        scrollTrigger: {
+          trigger: ".process",
+          start: "top top",
+          end: "+=140%",
+          pin: true,
+          scrub: 1,
+          anticipatePin: 1,
+          invalidateOnRefresh: true
+        }
+      });
+      /* rozestup podle šířky okna, aby texty karet zůstaly čitelné */
+      var spread = function () {
+        return Math.min(330, Math.max(120, (window.innerWidth - 350) / 3));
+      };
+      deckCards.forEach(function (card, i) {
+        var c = i - half; // -1.5 .. 1.5
+        gsap.set(card, { rotate: c * 3, zIndex: i + 1 });
+        dealTl.to(card, {
+          x: function () { return c * spread(); },
+          y: c * c * 18,
+          rotate: c * 8,
+          ease: "power1.inOut",
+          duration: 1
+        }, i * 0.18);
+      });
+    });
+
+    /* CTA: obří "Máte projekt?" přejede připnutou sekcí zprava doleva,
+       běží i na mobilech (velikost textu se škáluje přes vh/vw) */
+    var panText = document.getElementById("ctaPanText");
+    var panSec = document.querySelector(".cta-pan");
+    if (panText && panSec) {
+      gsap.fromTo(panText,
+        { x: function () { return window.innerWidth * 0.9; } },
+        {
+          x: function () { return -(panText.scrollWidth + window.innerWidth * 0.1); },
+          ease: "none",
           scrollTrigger: {
-            trigger: ".process",
+            trigger: panSec,
             start: "top top",
-            end: "+=140%",
+            end: function () { return "+=" + Math.round(panText.scrollWidth * 0.8); },
             pin: true,
             scrub: 1,
             anticipatePin: 1,
             invalidateOnRefresh: true
           }
         });
-        /* rozestup podle šířky okna, aby texty karet zůstaly čitelné */
-        var spread = function () {
-          return Math.min(330, Math.max(230, (window.innerWidth - 380) / 3));
-        };
-        deckCards.forEach(function (card, i) {
-          var c = i - half; // -1.5 .. 1.5
-          gsap.set(card, { rotate: c * 3, zIndex: i + 1 });
-          dealTl.to(card, {
-            x: function () { return c * spread(); },
-            y: c * c * 18,
-            rotate: c * 8,
-            ease: "power1.inOut",
-            duration: 1
-          }, i * 0.18);
-        });
-      }
-
-      /* CTA: obří "Máte projekt?" přejede připnutou sekcí zprava doleva */
-      var panText = document.getElementById("ctaPanText");
-      var panSec = document.querySelector(".cta-pan");
-      if (panText && panSec) {
-        gsap.fromTo(panText,
-          { x: function () { return window.innerWidth * 0.9; } },
-          {
-            x: function () { return -(panText.scrollWidth + window.innerWidth * 0.1); },
-            ease: "none",
-            scrollTrigger: {
-              trigger: panSec,
-              start: "top top",
-              end: function () { return "+=" + Math.round(panText.scrollWidth * 0.8); },
-              pin: true,
-              scrub: 1,
-              anticipatePin: 1,
-              invalidateOnRefresh: true
-            }
-          });
-      }
-    });
+    }
 
     /* Manifesto: word-by-word scrub */
     var manifesto = document.getElementById("manifestoText");
@@ -414,6 +416,28 @@
           }
         }
       );
+    }
+
+    /* Hrana pod postupem: černá se při odchodu vyboulí dolů a pustí papír;
+       scrub jede reverzibilně oběma směry */
+    var pCurvePath = document.getElementById("processCurvePath");
+    if (pCurvePath) {
+      var drawProcCurve = function (p) {
+        var edge = 160 * (1 - p);
+        var arc = 130 * Math.sin(p * Math.PI);
+        pCurvePath.setAttribute("d",
+          "M0,0 L1440,0 L1440," + edge.toFixed(1) +
+          " Q720," + (edge + arc).toFixed(1) +
+          " 0," + edge.toFixed(1) + " Z");
+      };
+      drawProcCurve(0);
+      window.ScrollTrigger.create({
+        trigger: ".process-curve",
+        start: "top bottom",
+        end: "top 15%",
+        scrub: true,
+        onUpdate: function (self) { drawProcCurve(self.progress); }
+      });
     }
 
     /* Hrana footeru: při scrollu dolů se černá vyboulí nahoru a postupně

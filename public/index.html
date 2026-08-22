@@ -12,7 +12,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=16">
+  <link rel="stylesheet" href="styles.css?v=17">
 </head>
 <body>
   <div class="loader" id="loader" aria-hidden="true">
@@ -228,6 +228,13 @@
       </div>
     </section>
 
+    <!-- zaoblený přechod z postupu zpět na papír -->
+    <div class="process-curve" aria-hidden="true">
+      <svg viewBox="0 0 1440 160" preserveAspectRatio="none">
+        <path id="processCurvePath" d="M0,0 L1440,0 L1440,104 Q720,200 0,104 Z"></path>
+      </svg>
+    </div>
+
     <!-- ═══ CTA PŘEJEZD ═══ -->
     <section class="cta-pan">
       <h2 class="sr-only">Máte projekt?</h2>
@@ -266,6 +273,6 @@
   <script src="vendor/gsap.min.js"></script>
   <script src="vendor/ScrollTrigger.min.js"></script>
   <script src="vendor/lenis.min.js"></script>
-  <script src="main.js?v=18"></script>
+  <script src="main.js?v=19"></script>
 </body>
 </html>

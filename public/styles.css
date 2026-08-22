@@ -265,6 +265,7 @@ html.js .loader.done { display: none; }
 /* ─── Hero ─── */
 .hero {
   position: relative;
+  min-height: 100vh; /* fallback pro starší Safari bez dvh */
   min-height: 100dvh;
   display: flex;
   align-items: flex-end;
@@ -564,8 +565,8 @@ html.js .loader.done { display: none; }
 .pc-1 p, .pc-3 p { color: var(--muted); }
 .pc-2 p, .pc-4 p { color: rgba(242, 240, 234, 0.75); }
 
-/* desktop: sekce se pinne na výšku viewportu, GSAP rozdává karty */
-@media (min-width: 1024px) and (prefers-reduced-motion: no-preference) {
+/* od tabletu výš se sekce pinne a GSAP rozdává karty */
+@media (min-width: 768px) and (prefers-reduced-motion: no-preference) {
   html.js .process {
     min-height: 100vh;
     display: flex;
@@ -612,7 +613,8 @@ html.js .loader.done { display: none; }
   font-size: clamp(2.6rem, 12vw, 6rem);
 }
 .cta-pan-line .cp-ch { display: inline-block; will-change: transform; }
-@media (min-width: 1024px) and (prefers-reduced-motion: no-preference) {
+/* přejezd běží i na mobilech - velikost se škáluje přes vh/vw */
+@media (prefers-reduced-motion: no-preference) {
   html.js .cta-pan {
     min-height: 100vh;
     display: flex;
@@ -627,17 +629,20 @@ html.js .loader.done { display: none; }
   }
 }
 
-/* ─── zvlněná hrana do patičky ─── */
-.footer-curve {
+/* ─── zvlněné hrany (postup → papír, papír → patička) ─── */
+.footer-curve,
+.process-curve {
   background: var(--paper);
   line-height: 0;
 }
-.footer-curve svg {
+.footer-curve svg,
+.process-curve svg {
   display: block;
   width: 100%;
   height: clamp(70px, 13vw, 160px);
 }
-.footer-curve path { fill: var(--ink); }
+.footer-curve path,
+.process-curve path { fill: var(--ink); }
 .sr-only {
   position: absolute;
   width: 1px;
