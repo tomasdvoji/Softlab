@@ -565,8 +565,22 @@ html.js .loader.done { display: none; }
 .pc-1 p, .pc-3 p { color: var(--muted); }
 .pc-2 p, .pc-4 p { color: rgba(242, 240, 234, 0.75); }
 
+/* na telefonu mají karty lehké natočení a vstupují revealem */
+@media (max-width: 767px) {
+  html.js .process-card[data-reveal].revealed:nth-child(odd) { transform: rotate(-1.5deg); }
+  html.js .process-card[data-reveal].revealed:nth-child(even) { transform: rotate(1.5deg); }
+  html:not(.js) .process-card:nth-child(odd) { transform: rotate(-1.5deg); }
+  html:not(.js) .process-card:nth-child(even) { transform: rotate(1.5deg); }
+}
+
 /* od tabletu výš se sekce pinne a GSAP rozdává karty */
 @media (min-width: 768px) and (prefers-reduced-motion: no-preference) {
+  /* transformy karet vlastní GSAP, reveal přechod by se s ním pral */
+  html.js .process-card[data-reveal] {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
   html.js .process {
     min-height: 100vh;
     display: flex;

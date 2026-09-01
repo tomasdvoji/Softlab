@@ -10,10 +10,12 @@
 
   var reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   var hasGsap = typeof window.gsap !== "undefined" && typeof window.ScrollTrigger !== "undefined";
+  var isTouch = "ontouchstart" in window || navigator.maxTouchPoints > 0;
 
-  /* ─── Smooth scroll (Lenis) ─── */
+  /* ─── Smooth scroll (Lenis) - jen s myší; na dotyku jede nativní scroll
+     a o stabilitu pinů se stará ScrollTrigger.normalizeScroll ─── */
   var lenis;
-  if (!reduceMotion && typeof window.Lenis !== "undefined" && hasGsap) {
+  if (!reduceMotion && !isTouch && typeof window.Lenis !== "undefined" && hasGsap) {
     lenis = new window.Lenis({
       anchors: {
         offset: -84,
@@ -241,9 +243,12 @@
       burger.focus();
     }
   });
-  window.matchMedia("(min-width: 901px)").addEventListener("change", function (e) {
+  var menuMq = window.matchMedia("(min-width: 901px)");
+  var onMenuMq = function (e) {
     if (e.matches && !menu.hidden) setMenu(false); // burger mizí nad 900px, menu nesmí zůstat viset
-  });
+  };
+  if (menuMq.addEventListener) menuMq.addEventListener("change", onMenuMq);
+  else if (menuMq.addListener) menuMq.addListener(onMenuMq); // starší Safari
 
   /* ─── Scroll reveals (IntersectionObserver, CSS does the animating) ─── */
   (function reveals() {
@@ -267,6 +272,13 @@
   if (hasGsap && !reduceMotion) {
     var gsap = window.gsap;
     gsap.registerPlugin(window.ScrollTrigger);
+
+    if (isTouch) {
+      /* iOS Safari: lišta prohlížeče při scrollu mění viewport a rozbíjí
+         pinované sekce; normalizace scrollu to řeší */
+      window.ScrollTrigger.config({ ignoreMobileResize: true });
+      if (window.ScrollTrigger.normalizeScroll) window.ScrollTrigger.normalizeScroll(true);
+    }
 
     /* Hero: masked line reveal (po preloaderu) */
     gsap.from(".hero-title .line-inner", {
