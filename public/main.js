@@ -1,6 +1,6 @@
-/* Softlab · interactions
-   GSAP + ScrollTrigger (scroll choreography), Lenis (smooth scroll),
-   generativní SVG vizuály + live blueprint hřiště.
+/* Softlab Digital · interactions
+   GSAP + ScrollTrigger with native scrolling,
+   generativní SVG vizuály.
    Everything gated by prefers-reduced-motion. */
 
 (function () {
@@ -10,25 +10,9 @@
 
   var reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   var hasGsap = typeof window.gsap !== "undefined" && typeof window.ScrollTrigger !== "undefined";
-  var isTouch = "ontouchstart" in window || navigator.maxTouchPoints > 0;
 
-  /* ─── Smooth scroll (Lenis) - jen s myší; na dotyku jede nativní scroll
-     a o stabilitu pinů se stará ScrollTrigger.normalizeScroll ─── */
-  var lenis;
-  if (!reduceMotion && !isTouch && typeof window.Lenis !== "undefined" && hasGsap) {
-    lenis = new window.Lenis({
-      anchors: {
-        offset: -84,
-        /* klidný sjezd na kotvy místo skoku - 2 s s ease-in-out */
-        duration: 2,
-        easing: function (t) { return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2; }
-      }
-    });
-    lenis.on("scroll", window.ScrollTrigger.update);
-    window.gsap.ticker.add(function (time) { lenis.raf(time * 1000); });
-    window.gsap.ticker.lagSmoothing(0);
-  }
 
+  // Native scroll preserves trackpad inertia and touch gestures.
   /* ─── Preloader: curtain nahoru, pak hero ─── */
   var loader = document.getElementById("loader");
   if (loader) {
@@ -273,13 +257,7 @@
     var gsap = window.gsap;
     gsap.registerPlugin(window.ScrollTrigger);
 
-    if (isTouch) {
-      /* iOS Safari: lišta prohlížeče při scrollu mění viewport a rozbíjí
-         pinované sekce; normalizace scrollu to řeší */
-      window.ScrollTrigger.config({ ignoreMobileResize: true });
-      if (window.ScrollTrigger.normalizeScroll) window.ScrollTrigger.normalizeScroll(true);
-    }
-
+    window.ScrollTrigger.config({ ignoreMobileResize: true });
     /* Hero: masked line reveal (po preloaderu) */
     gsap.from(".hero-title .line-inner", {
       yPercent: 135, /* mask má padding, menší posun by nechal vykouknout proužek */
@@ -289,23 +267,6 @@
       delay: 1.1
     });
     gsap.from(".hero-foot", { y: 24, opacity: 0, duration: 0.9, ease: "power3.out", delay: 1.6 });
-
-    /* Velocity pás: rychlost scrollu žene marquee a naklání ho */
-    var vTrack = document.getElementById("velocityTrack");
-    if (vTrack) {
-      var vGroup = vTrack.querySelector(".velocity-group");
-      var pos = 0, skew = 0;
-      gsap.ticker.add(function (time, dt) {
-        var gw = vGroup.offsetWidth;
-        if (!gw) return;
-        var v = lenis ? (lenis.velocity || 0) : 0;
-        var speed = 90 + Math.min(Math.abs(v) * 5, 700);
-        pos = (pos - speed * (dt / 1000)) % gw;
-        var target = Math.max(-10, Math.min(10, v * 0.35));
-        skew += (target - skew) * 0.08;
-        vTrack.style.transform = "translateX(" + pos + "px) skewX(" + skew + "deg)";
-      });
-    }
 
     /* Služby: předchozí karta se při překrytí zmenší a ztlumí */
     var mm = gsap.matchMedia();
@@ -325,28 +286,6 @@
           }
         });
       });
-
-      /* Projects: vertical scroll → horizontal pan
-         (piny se musí vytvářet v pořadí, v jakém jsou sekce na stránce,
-         jinak si ScrollTrigger špatně spočítá pozice) */
-      var track = document.getElementById("workTrack");
-      var pin = document.querySelector(".work-pin");
-      if (track && pin) {
-        var distance = function () { return Math.max(0, track.scrollWidth - window.innerWidth); };
-        gsap.to(track, {
-          x: function () { return -distance(); },
-          ease: "none",
-          scrollTrigger: {
-            trigger: pin,
-            start: "top top",
-            end: function () { return "+=" + distance(); },
-            pin: true,
-            scrub: 1,
-            anticipatePin: 1,
-            invalidateOnRefresh: true
-          }
-        });
-      }
 
     });
 
@@ -384,6 +323,15 @@
       });
     });
 
+    mm.add("(max-width: 767px)", function () {
+      gsap.utils.toArray(".process-card").forEach(function (card, i) {
+        gsap.fromTo(card, { y: 60, rotate: i % 2 ? 5 : -5, opacity: 0.25 }, {
+          y: 0, rotate: i % 2 ? 1.5 : -1.5, opacity: 1, ease: "none",
+          scrollTrigger: { trigger: card, start: "top 95%", end: "top 55%", scrub: 0.3 }
+        });
+      });
+    });
+
     /* CTA: obří "Máte projekt?" přejede připnutou sekcí zprava doleva,
        běží i na mobilech (velikost textu se škáluje přes vh/vw) */
     var panText = document.getElementById("ctaPanText");
@@ -404,30 +352,6 @@
             invalidateOnRefresh: true
           }
         });
-    }
-
-    /* Manifesto: word-by-word scrub */
-    var manifesto = document.getElementById("manifestoText");
-    if (manifesto) {
-      var words = manifesto.textContent.trim().split(/\s+/);
-      manifesto.innerHTML = words
-        .map(function (word) { return '<span class="word">' + word + "</span>"; })
-        .join(" ");
-      gsap.fromTo(
-        manifesto.querySelectorAll(".word"),
-        { opacity: 0.12 },
-        {
-          opacity: 1,
-          stagger: 0.06,
-          ease: "none",
-          scrollTrigger: {
-            trigger: manifesto,
-            start: "top 78%",
-            end: "bottom 45%",
-            scrub: true
-          }
-        }
-      );
     }
 
     /* Hrana pod postupem: černá se při odchodu vyboulí dolů a pustí papír;
@@ -474,7 +398,31 @@
       });
     }
 
+    window.ScrollTrigger.sort();
+    window.ScrollTrigger.refresh();
   }
+
+  var inquiry = document.getElementById("poptavka");
+  document.querySelectorAll('a[href="#poptavka"]').forEach(function (link) {
+    link.addEventListener("click", function (event) {
+      event.preventDefault();
+      inquiry.scrollIntoView({ behavior: reduceMotion ? "instant" : "smooth", block: "start" });
+      inquiry.elements.name.focus({ preventScroll: true });
+      if (!reduceMotion && inquiry.animate) inquiry.animate(
+        [{ opacity: 0.35, transform: "translateY(20px)" }, { opacity: 1, transform: "translateY(0)" }],
+        { duration: 600, easing: "ease-out" }
+      );
+    });
+  });
+  inquiry.addEventListener("submit", function (event) {
+    event.preventDefault();
+    if (!inquiry.reportValidity()) return;
+    var data = new FormData(inquiry);
+    var body = "Jméno: " + data.get("name") + "\nE-mail: " + data.get("email") +
+      "\nTelefon: " + data.get("phone") + "\nSlužba: " + data.get("service") + "\n\n" + data.get("description");
+    window.location.href = "mailto:studio@softlab.cz?subject=" + encodeURIComponent("Poptávka: " + data.get("service")) + "&body=" + encodeURIComponent(body);
+    document.getElementById("inquiryStatus").textContent = "Poptávka je připravená pro e-mailovou aplikaci. Pokud se neotevřela, napište na studio@softlab.cz. Údaje zůstávají ve formuláři.";
+  });
 
   /* ─── Footer year ─── */
   document.getElementById("year").textContent = String(new Date().getFullYear());

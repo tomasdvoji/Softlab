@@ -3,35 +3,35 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Softlab · Weby a interní systémy na míru</title>
-  <meta name="description" content="Softlab je studio, které firmám staví rychlé weby a interní software přesně podle jejich procesů. Od analýzy po dlouhodobý provoz.">
-  <meta property="og:title" content="Softlab · Weby a interní systémy na míru">
+  <title>Softlab Digital · Weby a interní systémy na míru</title>
+  <meta name="description" content="Softlab Digital je studio, které firmám staví rychlé weby a interní software přesně podle jejich procesů. Od analýzy po dlouhodobý provoz.">
+  <meta property="og:title" content="Softlab Digital · Weby a interní systémy na míru">
   <meta property="og:description" content="Stavíme weby a interní software, který kopíruje procesy vaší firmy, ne naopak.">
   <meta property="og:type" content="website">
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' fill='%23141412'/%3E%3Ctext x='32' y='45' font-family='Arial,sans-serif' font-size='38' font-weight='800' text-anchor='middle' fill='%23f2f0ea'%3ES%3C/text%3E%3C/svg%3E">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=18">
+  <link rel="stylesheet" href="styles.css?v=20">
 </head>
 <body>
   <div class="loader" id="loader" aria-hidden="true">
-    <span class="loader-mask"><span class="loader-word">Softlab<sup>®</sup></span></span>
+    <span class="loader-mask"><span class="loader-word">Softlab Digital<sup>®</sup></span></span>
   </div>
 
   <a class="skip-link" href="#obsah">Přeskočit na obsah</a>
 
   <header class="nav" id="nav">
     <div class="nav-inner">
-      <a class="nav-logo" href="#" aria-label="Softlab, úvod">Softlab<sup>®</sup></a>
+      <a class="nav-logo" href="#" aria-label="Softlab Digital, úvod">Softlab Digital<sup>®</sup></a>
       <nav class="nav-links" aria-label="Hlavní navigace">
         <a href="#sluzby">Služby</a>
-        <a href="#projekty">Projekty</a>
         <a href="#postup">Postup</a>
+        <a href="#projekty">Projekty</a>
         <a href="#kontakt">Kontakt</a>
         <a href="/admin/files">Přihlášení</a>
       </nav>
-      <a class="u-link nav-cta" href="#kontakt">Poptat projekt</a>
+      <a class="u-link nav-cta project-cta" href="#poptavka">Poptat projekt</a>
       <button class="nav-burger" id="navBurger" aria-label="Otevřít menu" aria-expanded="false" aria-controls="mobileMenu">
         <span></span><span></span>
       </button>
@@ -41,11 +41,11 @@
   <div class="mobile-menu" id="mobileMenu" hidden>
     <nav aria-label="Mobilní navigace">
       <a href="#sluzby">Služby</a>
-      <a href="#projekty">Projekty</a>
       <a href="#postup">Postup</a>
+      <a href="#projekty">Projekty</a>
       <a href="#kontakt">Kontakt</a>
       <a href="/admin/files">Přihlášení</a>
-      <a class="mobile-menu-cta u-link" href="#kontakt">Poptat projekt</a>
+      <a class="mobile-menu-cta u-link project-cta" href="#poptavka">Poptat projekt</a>
     </nav>
   </div>
 
@@ -62,45 +62,11 @@
           <span class="line line-right"><span class="line-inner hero-accent">na míru.</span></span>
         </h1>
         <div class="hero-foot">
-          <p class="hero-sub">Jsme Softlab. Firmám stavíme rychlé weby a software, který kopíruje jejich procesy, ne naopak.</p>
-          <a class="u-link u-link-lg" href="#kontakt">Poptat projekt</a>
+          <p class="hero-sub">Jsme Softlab Digital. Firmám stavíme rychlé weby a software, který kopíruje jejich procesy, ne naopak.</p>
+          <a class="u-link u-link-lg project-cta" href="#poptavka">Poptat projekt</a>
         </div>
       </div>
     </section>
-
-    <!-- ═══ MANIFEST ═══ -->
-    <section class="manifesto">
-      <div class="container">
-        <p class="manifesto-text" id="manifestoText">Neprodáváme hodiny. Stavíme nástroje, které firmám vracejí čas.</p>
-      </div>
-    </section>
-
-    <!-- ═══ VELOCITY PÁS ═══ -->
-    <div class="velocity" aria-hidden="true">
-      <div class="velocity-track" id="velocityTrack">
-        <div class="velocity-group">
-          <span class="vw">Weby</span>
-          <span class="vw vw-outline">E-shopy</span>
-          <span class="vw">Systémy</span>
-          <span class="vw vw-outline">Automatizace</span>
-          <span class="vw">Podpora</span>
-        </div>
-        <div class="velocity-group">
-          <span class="vw">Weby</span>
-          <span class="vw vw-outline">E-shopy</span>
-          <span class="vw">Systémy</span>
-          <span class="vw vw-outline">Automatizace</span>
-          <span class="vw">Podpora</span>
-        </div>
-        <div class="velocity-group">
-          <span class="vw">Weby</span>
-          <span class="vw vw-outline">E-shopy</span>
-          <span class="vw">Systémy</span>
-          <span class="vw vw-outline">Automatizace</span>
-          <span class="vw">Podpora</span>
-        </div>
-      </div>
-    </div>
 
     <!-- ═══ SLUŽBY (sticky stack) ═══ -->
     <section class="services" id="sluzby">
@@ -150,50 +116,6 @@
       </ul>
     </section>
 
-    <!-- ═══ PROJEKTY (HORIZONTAL PAN, generativní vizuály) ═══ -->
-    <!-- mock: ukázkové projekty, nahraďte reálnými referencemi -->
-    <section class="work" id="projekty">
-      <div class="work-pin">
-        <div class="container work-head">
-          <h2 class="section-title mask-title" data-reveal><span class="mt-inner">Vybrané projekty</span></h2>
-        </div>
-        <div class="work-track" id="workTrack">
-          <article class="work-card">
-            <div class="work-media reveal-img" data-reveal data-art="routes" data-seed="7" role="img" aria-label="Abstraktní schéma plánování tras"></div>
-            <div class="work-meta">
-              <h3>HB Logistik</h3>
-              <span class="work-tag">Interní systém</span>
-              <p>Dispečink bez papírů. Plánování tras a evidence zakázek na jedné obrazovce.</p>
-            </div>
-          </article>
-          <article class="work-card">
-            <div class="work-media reveal-img" data-reveal data-art="parts" data-seed="21" role="img" aria-label="Abstraktní mřížka strojních dílů"></div>
-            <div class="work-meta">
-              <h3>KOVAX</h3>
-              <span class="work-tag">E-shop</span>
-              <p>B2B e-shop napojený na ERP. Ceníky a dostupnost skladu v reálném čase.</p>
-            </div>
-          </article>
-          <article class="work-card">
-            <div class="work-media reveal-img" data-reveal data-art="paragraphs" data-seed="5" role="img" aria-label="Abstraktní bloky právního dokumentu"></div>
-            <div class="work-meta">
-              <h3>Doleček a partneři</h3>
-              <span class="work-tag">Web</span>
-              <p>Web advokátní kanceláře s online rezervací konzultací.</p>
-            </div>
-          </article>
-          <article class="work-card">
-            <div class="work-media reveal-img" data-reveal data-art="stacks" data-seed="13" role="img" aria-label="Abstraktní skládané palety"></div>
-            <div class="work-meta">
-              <h3>Stavebniny Beran</h3>
-              <span class="work-tag">Portál</span>
-              <p>Objednávkový portál pro stálé zákazníky. Objednávka za minutu, ne za telefonát.</p>
-            </div>
-          </article>
-        </div>
-      </div>
-    </section>
-
     <!-- ═══ POSTUP (sticky čítač kroků) ═══ -->
     <section class="process" id="postup">
       <div class="container">
@@ -235,6 +157,48 @@
       </svg>
     </div>
 
+    <!-- ═══ SHOWCASE ═══ -->
+    <section class="work" id="projekty" aria-labelledby="workTitle">
+      <div class="work-pin">
+        <div class="container work-head">
+          <h2 class="section-title mask-title" id="workTitle" data-reveal><span class="mt-inner">Vybrané projekty</span></h2>
+          <p class="work-intro">Každý web má svůj vlastní charakter. Prohlédněte si je naživo.</p>
+        </div>
+        <div class="showcase-grid container">
+          <article class="showcase-card" data-reveal>
+            <a class="showcase-link" href="https://www.alerta.cz/" target="_blank" rel="noopener noreferrer" aria-label="Alerta — otevřít web v nové kartě">
+              <div class="showcase-preview">
+                <div class="showcase-browser" aria-hidden="true"><span class="showcase-dots">● ● ●</span><span>alerta.cz</span><span>↗</span></div>
+                <img src="showcase/alerta.jpg" width="1440" height="960" loading="lazy" decoding="async" alt="Náhled úvodní stránky Alerta">
+                <span class="showcase-open" aria-hidden="true">Prohlédnout web ↗</span>
+              </div>
+              <div class="showcase-meta"><span class="showcase-number">01</span><h3>Alerta</h3><span class="work-tag">Partner T-Mobile</span><span class="showcase-arrow" aria-hidden="true">↗</span><p>Web sítě partnerských prodejen T-Mobile.</p></div>
+            </a>
+          </article>
+          <article class="showcase-card" data-reveal>
+            <a class="showcase-link" href="https://www.helion.cz/" target="_blank" rel="noopener noreferrer" aria-label="Helion — otevřít web v nové kartě">
+              <div class="showcase-preview">
+                <div class="showcase-browser" aria-hidden="true"><span class="showcase-dots">● ● ●</span><span>helion.cz</span><span>↗</span></div>
+                <img src="showcase/helion.jpg" width="1440" height="960" loading="lazy" decoding="async" alt="Náhled úvodní stránky Helion">
+                <span class="showcase-open" aria-hidden="true">Prohlédnout web ↗</span>
+              </div>
+              <div class="showcase-meta"><span class="showcase-number">02</span><h3>Helion</h3><span class="work-tag">Fotovoltaika</span><span class="showcase-arrow" aria-hidden="true">↗</span><p>Fotovoltaika, chytrá energie a servis.</p></div>
+            </a>
+          </article>
+          <article class="showcase-card" data-reveal>
+            <a class="showcase-link" href="https://naoku.cz/" target="_blank" rel="noopener noreferrer" aria-label="naOku — otevřít web v nové kartě">
+              <div class="showcase-preview">
+                <div class="showcase-browser" aria-hidden="true"><span class="showcase-dots">● ● ●</span><span>naoku.cz</span><span>↗</span></div>
+                <img src="showcase/naoku.jpg" width="1440" height="960" loading="lazy" decoding="async" alt="Náhled úvodní stránky naOku">
+                <span class="showcase-open" aria-hidden="true">Prohlédnout web ↗</span>
+              </div>
+              <div class="showcase-meta"><span class="showcase-number">03</span><h3>naOku</h3><span class="work-tag">Autorská značka</span><span class="showcase-arrow" aria-hidden="true">↗</span><p>Ručně háčkované kousky z přírodních materiálů.</p></div>
+            </a>
+          </article>
+        </div>
+      </div>
+    </section>
+
     <!-- ═══ CTA PŘEJEZD ═══ -->
     <section class="cta-pan">
       <h2 class="sr-only">Máte projekt?</h2>
@@ -256,23 +220,39 @@
       <p class="footer-sub">Napište nám dvě věty o tom, co potřebujete. Ozveme se do 24 hodin.</p>
       <a class="footer-mail" href="mailto:studio@softlab.cz?subject=Popt%C3%A1vka%20projektu">studio@softlab.cz</a>
     </div>
+    <div class="container inquiry-wrap">
+      <a class="footer-phone" href="tel:+420728521533">+420 728 521 533</a>
+      <form class="inquiry-form" id="poptavka">
+        <h3>Povězte nám o projektu</h3>
+        <div class="inquiry-grid">
+          <label>Jméno<input name="name" autocomplete="name" required maxlength="120"></label>
+          <label>E-mail<input name="email" type="email" autocomplete="email" required maxlength="254"></label>
+          <label>Telefon<input name="phone" type="tel" autocomplete="tel" required maxlength="40"></label>
+          <label>Co od nás potřebujete?<select name="service" required><option value="">Vyberte službu</option><option>Web</option><option>E-shop</option><option>Interní systém</option><option>Automatizace</option><option>Podpora a rozvoj</option><option>Něco jiného</option></select></label>
+        </div>
+        <label>Krátký popis (nepovinné)<textarea name="description" rows="4" maxlength="3000"></textarea></label>
+        <p class="inquiry-note">Tlačítko otevře váš e-mail s vyplněnou poptávkou. Odeslání potvrdíte v e-mailové aplikaci.</p>
+        <button class="project-cta" type="submit">Připravit poptávku ↗</button>
+        <p id="inquiryStatus" role="status"></p>
+      </form>
+    </div>
     <div class="container footer-bottom">
-      <span class="footer-brand">Softlab<sup>®</sup></span>
+      <span class="footer-brand">Softlab Digital<sup>®</sup></span>
       <nav class="footer-links" aria-label="Patička">
         <a href="#sluzby">Služby</a>
-        <a href="#projekty">Projekty</a>
         <a href="#postup">Postup</a>
+        <a href="#projekty">Projekty</a>
         <a href="/files/">Předání podkladů</a>
         <a href="/admin/files">Přihlášení</a>
       </nav>
-      <p class="footer-note">© <span id="year">2026</span> Softlab</p>
+      <p class="footer-note">© <span id="year">2026</span> Softlab Digital</p>
     </div>
-    <div class="footer-mark" aria-hidden="true">Softlab<sup>®</sup></div>
+    <div class="footer-mark" aria-hidden="true">Softlab Digital<sup>®</sup></div>
   </footer>
 
   <script src="vendor/gsap.min.js"></script>
   <script src="vendor/ScrollTrigger.min.js"></script>
-  <script src="vendor/lenis.min.js"></script>
-  <script src="main.js?v=20"></script>
+
+  <script src="main.js?v=21"></script>
 </body>
 </html>

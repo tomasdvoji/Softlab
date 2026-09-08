@@ -32,7 +32,7 @@ export function adminLoginHtml() {
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="robots" content="noindex">
-<title>Přihlášení · Softlab administrace</title>
+<title>Přihlášení · Softlab Digital administrace</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -45,7 +45,7 @@ export function adminLoginHtml() {
 <body>
 <div class="wrap">
   <div class="login">
-    <a class="logo" href="/">Softlab<sup>®</sup></a>
+    <a class="logo" href="/">Softlab Digital<sup>®</sup></a>
     <h1 style="margin-top:2.5rem">Administrace<br>podkladů</h1>
     <form id="loginForm">
       <label for="user">Přihlašovací jméno</label>
@@ -87,7 +87,7 @@ export function adminAppHtml() {
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="robots" content="noindex">
-<title>Podklady klientů · Softlab administrace</title>
+<title>Podklady klientů · Softlab Digital administrace</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -132,7 +132,7 @@ export function adminAppHtml() {
 <body>
 <div class="wrap">
   <header class="bar">
-    <a class="logo" href="/">Softlab<sup>®</sup></a>
+    <a class="logo" href="/">Softlab Digital<sup>®</sup></a>
     <nav class="bar-nav" aria-label="Administrace">
       <a href="#" data-nav="podklady">Podklady</a>
       <a href="#/trezor" data-nav="trezor">Trezor</a>
@@ -183,11 +183,11 @@ document.getElementById('logoutBtn').addEventListener('click', async function ()
 
 /* ── klientské odkazy ── */
 function mailtoFor(inv) {
-  var subject = 'Předání podkladů · Softlab';
+  var subject = 'Předání podkladů · Softlab Digital';
   var body = 'Dobrý den,\n\npro předání podkladů k vaší zakázce prosím použijte tento odkaz:\n'
     + inv.url + '\n\nPřihlašovací jméno: ' + inv.clientName
     + (inv.password ? '\nHeslo: ' + inv.password : '')
-    + '\n\nDěkujeme,\nSoftlab';
+    + '\n\nDěkujeme,\nSoftlab Digital';
   return 'mailto:' + encodeURIComponent(inv.email || '') + '?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(body);
 }
 
@@ -511,7 +511,7 @@ async function renderVault() {
         renderVault();
       } catch (e2) { vaultKey = null; errP.textContent = e2.message; }
     });
-    app.appendChild(el('p', { class: 'muted', text: 'Interní soubory jen pro Softlab. Vyžadují druhé heslo.' }));
+    app.appendChild(el('p', { class: 'muted', text: 'Interní soubory jen pro Softlab Digital. Vyžadují druhé heslo.' }));
     app.appendChild(form);
     input.focus();
     return;
