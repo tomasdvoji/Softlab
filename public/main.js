@@ -165,27 +165,6 @@
     t.appendChild(wrap);
   });
 
-  /* ─── CTA přejezd: rozsekat na znaky s hravým natočením ─── */
-  (function splitPan() {
-    var el = document.getElementById("ctaPanText");
-    if (!el) return;
-    var text = el.textContent;
-    el.textContent = "";
-    for (var i = 0; i < text.length; i++) {
-      if (text[i] === " ") {
-        el.appendChild(document.createTextNode(" "));
-        continue;
-      }
-      var s = document.createElement("span");
-      s.className = "cp-ch";
-      s.textContent = text[i];
-      var r = (i % 2 ? 1 : -1) * (2 + ((i * 5) % 5));
-      var y = ((i % 3) - 1) * 0.045;
-      s.style.transform = "rotate(" + r + "deg) translateY(" + y + "em)";
-      el.appendChild(s);
-    }
-  })();
-
   /* ─── Nav: paper background after scroll ─── */
   var nav = document.getElementById("nav");
   var onScroll = function () {

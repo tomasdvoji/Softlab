@@ -626,7 +626,6 @@ html.js .loader.done { display: none; }
   text-align: center;
   font-size: clamp(2.6rem, 12vw, 6rem);
 }
-.cta-pan-line .cp-ch { display: inline-block; will-change: transform; }
 /* přejezd běží i na mobilech - velikost se škáluje přes vh/vw */
 @media (prefers-reduced-motion: no-preference) {
   html.js .cta-pan {
