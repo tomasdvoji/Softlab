@@ -12,7 +12,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=21">
+  <link rel="stylesheet" href="styles.css?v=22">
 </head>
 <body>
   <div class="loader" id="loader" aria-hidden="true">
@@ -243,12 +243,31 @@
         <a href="#postup">Postup</a>
         <a href="#projekty">Projekty</a>
         <a href="/files/">Předání podkladů</a>
+        <a href="/gdpr/">Ochrana údajů</a>
         <a href="/admin/files">Přihlášení</a>
       </nav>
       <p class="footer-note">© <span id="year">2026</span> Softlab Digital</p>
     </div>
     <div class="footer-mark" aria-hidden="true">Softlab Digital<sup>®</sup></div>
   </footer>
+
+  <div class="cookie-bar" id="cookieBar" role="region" aria-label="Informace o cookies" hidden>
+    <p>Používáme jen technické cookies nezbytné pro chod webu. Žádná analytika, žádný marketing. <a href="/gdpr/">Více o ochraně údajů</a></p>
+    <button type="button" id="cookieOk">Rozumím</button>
+  </div>
+  <script>
+    (function () {
+      try {
+        if (localStorage.getItem('sl-cookies') === '1') return;
+      } catch (e) {}
+      var bar = document.getElementById('cookieBar');
+      bar.hidden = false;
+      document.getElementById('cookieOk').addEventListener('click', function () {
+        bar.hidden = true;
+        try { localStorage.setItem('sl-cookies', '1'); } catch (e) {}
+      });
+    })();
+  </script>
 
   <script src="vendor/gsap.min.js"></script>
   <script src="vendor/ScrollTrigger.min.js"></script>

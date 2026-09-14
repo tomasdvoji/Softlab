@@ -837,3 +837,40 @@ html.js .loader.done { display: none; }
   .showcase-open { right: .65rem; bottom: .65rem; padding: .5rem .7rem; font-size: .75rem; }
   .showcase-card:first-child .showcase-preview img { aspect-ratio: 3 / 2; }
 }
+
+/* ─── Cookie bar ─── */
+.cookie-bar {
+  position: fixed;
+  left: 1rem;
+  right: 1rem;
+  bottom: 1rem;
+  z-index: 90;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 0.9rem 1.1rem;
+  background: var(--ink);
+  color: var(--paper);
+  border: 1px solid var(--ink);
+}
+.cookie-bar[hidden] { display: none; }
+.cookie-bar p { margin: 0; font-size: 0.85rem; line-height: 1.5; flex: 1; }
+.cookie-bar a { color: var(--accent-soft); text-underline-offset: 3px; }
+.cookie-bar button {
+  flex: none;
+  font: inherit;
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  background: var(--paper);
+  color: var(--ink);
+  border: 0;
+  padding: 0.65rem 1.1rem;
+  cursor: pointer;
+}
+@media (max-width: 560px) {
+  .cookie-bar { flex-direction: column; align-items: stretch; text-align: left; }
+}
