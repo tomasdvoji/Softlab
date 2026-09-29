@@ -1,4 +1,4 @@
-/* Softlab Digital · interactions
+/* Softlab Interactive · interactions
    GSAP + ScrollTrigger with native scrolling,
    generativní SVG vizuály.
    Everything gated by prefers-reduced-motion. */
