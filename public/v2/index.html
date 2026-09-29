@@ -4,9 +4,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Softlab Interactive · Weby a interní systémy na míru</title>
-  <meta name="description" content="Softlab Interactive staví firmám rychlé weby a interní software přesně podle jejich procesů.">
+  <meta name="description" content="Softlab Interactive je studio, které firmám staví rychlé weby a interní software přesně podle jejich procesů. Od analýzy po dlouhodobý provoz.">
   <meta name="robots" content="noindex">
-  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='10' fill='%23ff98a2'/%3E%3Ctext x='32' y='47' font-family='Arial,sans-serif' font-size='40' font-weight='900' text-anchor='middle' fill='%23000'%3ES%3C/text%3E%3C/svg%3E">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%23ff98a2'/%3E%3Ctext x='32' y='47' font-family='Arial,sans-serif' font-size='40' font-weight='900' text-anchor='middle' fill='%23000'%3ES%3C/text%3E%3C/svg%3E">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Anton&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
@@ -17,241 +17,411 @@
       --muted: #8c8c8c;
       --line: #262626;
       --pink: #ff98a2;
-      --card: #0d0d0d;
-      --nav-h: 56px;
+      --panel: #0e0e0e;
+      --nav-h: 60px;
+      --r: 18px;
     }
     *, *::before, *::after { box-sizing: border-box; }
     html { background: var(--bg); }
     html.lenis, html.lenis body { height: auto; }
     .lenis.lenis-smooth { scroll-behavior: auto !important; }
-    body { margin: 0; background: var(--bg); color: var(--fg); font: 400 15px/1.55 Roboto, system-ui, sans-serif; -webkit-font-smoothing: antialiased; overflow-x: hidden; }
+    body { margin: 0; background: var(--bg); color: var(--fg); font: 400 15px/1.55 Roboto, system-ui, sans-serif; -webkit-font-smoothing: antialiased; overflow-x: clip; }
     a { color: inherit; text-decoration: none; }
     img { max-width: 100%; display: block; }
     ::selection { background: var(--pink); color: #000; }
-    .display { font-family: Anton, Impact, "Arial Narrow", sans-serif; font-weight: 400; text-transform: uppercase; line-height: 0.9; letter-spacing: 0.005em; margin: 0; }
-    .eyebrow { font-weight: 700; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.08em; }
-    .wrap { width: min(1400px, 100% - 2.5rem); margin: 0 auto; }
+    .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+    .display { font-family: Anton, Impact, "Arial Narrow", sans-serif; font-weight: 400; text-transform: uppercase; line-height: 0.9; margin: 0; }
+    .caps { font-weight: 700; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.08em; }
+    .wrap { width: min(1440px, 100% - 2rem); margin: 0 auto; }
+
+    /* label s tečkou (Struxent) */
+    .label { display: inline-flex; align-items: center; gap: 0.55rem; font: 700 0.7rem/1 Roboto, sans-serif; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); }
+    .label::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--pink); }
+
+    /* pilulky */
+    .pill { height: 42px; display: inline-flex; align-items: center; gap: 0.7rem; border-radius: 999px; padding: 0 0.45rem 0 1.3rem; font: 700 0.72rem/1 Roboto, sans-serif; text-transform: uppercase; letter-spacing: 0.07em; border: 0; cursor: pointer; transition: background .25s, color .25s, transform .25s; }
+    .pill .ico { width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center; font-size: 0.9rem; transition: transform .35s cubic-bezier(.6,0,.2,1); }
+    .pill:hover .ico { transform: rotate(45deg); }
+    .pill-pink { background: var(--pink); color: #000; }
+    .pill-pink .ico { background: #000; color: var(--pink); }
+    .pill-pink:hover { background: #fff; }
+    .pill-ghost { background: transparent; color: var(--fg); border: 1px solid #3a3a3a; }
+    .pill-ghost .ico { background: var(--fg); color: #000; }
+    .pill-ghost:hover { border-color: var(--pink); color: var(--pink); }
 
     /* nav */
-    .nav { position: fixed; inset: 0 0 auto; z-index: 50; height: var(--nav-h); display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; padding: 0 1.25rem; background: linear-gradient(#000 40%, transparent); }
-    .nav-group { display: flex; gap: 0.2rem; }
+    .nav { position: fixed; inset: 0 0 auto; z-index: 60; height: var(--nav-h); display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; padding: 0 1.25rem; transition: background .3s; }
+    .nav.scrolled { background: rgba(0,0,0,.82); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); }
+    .nav-group { display: flex; align-items: center; gap: 0.1rem; }
     .nav-group:last-child { justify-content: flex-end; }
-    .nav-group a { padding: 0.7rem 0.6rem; transition: color .2s; }
-    .nav-group a:hover { color: var(--pink); }
-    .nav-mark { width: 32px; height: 32px; border-radius: 6px; background: var(--pink); color: #000; display: grid; place-items: center; font: 400 20px/1 Anton, sans-serif; transition: transform .4s cubic-bezier(.6,0,.2,1); }
+    .nav-group > a:not(.pill) { padding: 0.8rem 0.65rem; transition: color .2s; }
+    .nav-group > a:not(.pill):hover { color: var(--pink); }
+    .nav .pill { height: 36px; margin-left: 0.5rem; }
+    .nav .pill .ico { width: 26px; height: 26px; }
+    .nav-mark { width: 34px; height: 34px; border-radius: 8px; background: var(--pink); color: #000; display: grid; place-items: center; font: 400 21px/1 Anton, sans-serif; transition: transform .45s cubic-bezier(.6,0,.2,1); }
     .nav-mark:hover { transform: rotate(-12deg) scale(1.08); }
-    .progress { position: fixed; left: 0; top: var(--nav-h); height: 2px; width: 100%; background: var(--pink); transform-origin: 0 50%; transform: scaleX(0); z-index: 51; }
+    .progress { position: fixed; left: 0; top: var(--nav-h); height: 2px; width: 100%; background: var(--pink); transform-origin: 0 50%; transform: scaleX(0); z-index: 61; }
+    .burger { display: none; width: 44px; height: 44px; border: 0; background: transparent; color: var(--fg); cursor: pointer; font: 700 0.72rem/1 Roboto, sans-serif; text-transform: uppercase; letter-spacing: .08em; justify-self: end; }
+    .mnav { position: fixed; inset: 0; z-index: 59; background: #000; display: flex; flex-direction: column; justify-content: center; gap: 0.3rem; padding: 2rem 1.5rem; }
+    .mnav[hidden] { display: none; }
+    .mnav a { font: 400 clamp(2.6rem, 12vw, 4rem)/1 Anton, sans-serif; text-transform: uppercase; }
+    .mnav a:hover { color: var(--pink); }
 
-    /* hero */
-    .hero { min-height: 100vh; min-height: 100svh; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: calc(var(--nav-h) + 3rem) 1.25rem 4rem; background: radial-gradient(120% 70% at 50% 110%, #2a1417 0%, #000 60%); }
-    .hero h1 { font-size: clamp(3.6rem, 13.2vw, 13rem); }
-    .hero h1 .row { display: block; overflow: hidden; padding-bottom: 0.04em; }
+    /* hero: zaoblená karta se září (Struxent) + typografie Lenis */
+    .hero { padding: calc(var(--nav-h) + 0.5rem) 0.75rem 0.75rem; }
+    .hero-card { position: relative; min-height: calc(100vh - var(--nav-h) - 1.25rem); min-height: calc(100svh - var(--nav-h) - 1.25rem); border-radius: var(--r); overflow: hidden; background: #070707; display: flex; flex-direction: column; justify-content: space-between; padding: clamp(1.2rem, 3vw, 2.4rem); isolation: isolate; }
+    .hero-glow { position: absolute; left: 50%; top: 58%; width: min(900px, 120vw); aspect-ratio: 1; transform: translate(-50%, -50%); border-radius: 50%; background: radial-gradient(circle, rgba(255,152,162,.55) 0%, rgba(255,152,162,.14) 35%, transparent 65%); filter: blur(30px); z-index: -1; }
+    .hero-rings { position: absolute; inset: 0; z-index: -1; opacity: .35; }
+    .hero-top { display: flex; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
+    .hero-badge { display: inline-flex; align-items: center; gap: .6rem; border: 1px solid #2c2c2c; background: rgba(0,0,0,.5); border-radius: 999px; padding: .45rem .9rem .45rem .45rem; font-size: .8rem; }
+    .hero-badge b { width: 22px; height: 22px; border-radius: 50%; background: var(--pink); color: #000; display: grid; place-items: center; font: 400 12px/1 Anton, sans-serif; }
+    .hero h1 { font-size: clamp(3.3rem, 11.4vw, 12.5rem); letter-spacing: 0.005em; }
+    .hero h1 .row { display: block; overflow: hidden; padding: 0.16em 0 0.05em; margin: -0.16em 0 -0.05em; }
     .hero h1 .row > span { display: inline-block; }
-    .hero-sub { margin: 1.2rem 0 2.4rem; font: 400 clamp(1rem, 2.4vw, 1.9rem)/1.1 Anton, sans-serif; text-transform: uppercase; letter-spacing: 0.04em; }
-    .pill-form { display: flex; gap: 0.4rem; width: min(430px, 100%); }
-    .pill-form input { flex: 1; min-width: 0; height: 40px; border-radius: 999px; border: 1px solid #3a3a3a; background: #0a0a0a; color: var(--fg); padding: 0 1.1rem; font: inherit; font-size: 0.85rem; }
-    .pill-form input:focus { outline: none; border-color: var(--pink); }
-    .btn-pink { height: 40px; border: 0; border-radius: 999px; background: var(--pink); color: #000; padding: 0 1.3rem; font: 700 0.72rem/1 Roboto, sans-serif; text-transform: uppercase; letter-spacing: 0.06em; cursor: pointer; display: inline-flex; align-items: center; transition: transform .25s, background .25s; }
-    .btn-pink:hover { background: #fff; transform: translateY(-2px); }
-    .hero-note { margin-top: 0.9rem; font-size: 0.72rem; color: var(--muted); }
+    .hero h1 .row:nth-child(3) { color: var(--pink); }
+    .hero-foot { display: grid; grid-template-columns: minmax(0, 36ch) auto; justify-content: space-between; align-items: end; gap: 1.5rem; margin-top: 1.5rem; }
+    .hero-foot p { margin: .8rem 0 0; font-size: clamp(0.95rem, 1.3vw, 1.1rem); color: #cfcfcf; }
 
-    /* marquee */
-    .ticker { border-block: 1px solid var(--line); overflow: hidden; padding: 1.1rem 0; white-space: nowrap; }
-    .ticker-track { display: inline-flex; gap: 2.5rem; font: 400 clamp(1.6rem, 3.6vw, 3rem)/1 Anton, sans-serif; text-transform: uppercase; will-change: transform; }
-    .ticker-track span:nth-child(even) { color: var(--pink); }
+    /* ticker (Kora) */
+    .ticker { overflow: hidden; padding: 1.4rem 0; white-space: nowrap; border-bottom: 1px solid var(--line); }
+    .ticker-track { display: inline-flex; align-items: center; gap: 2.2rem; font: 400 clamp(1.6rem, 3.4vw, 2.8rem)/1 Anton, sans-serif; text-transform: uppercase; will-change: transform; }
+    .ticker-track i { width: 10px; height: 10px; border-radius: 50%; background: var(--pink); flex: none; }
 
-    /* section heads */
-    section { padding: clamp(5rem, 12vw, 9rem) 0; }
-    .sec-head { display: flex; justify-content: space-between; align-items: end; gap: 1.5rem; flex-wrap: wrap; margin-bottom: 2.2rem; }
-    .sec-head h2 { font-size: clamp(3rem, 9vw, 8.5rem); }
+    section { padding: clamp(5rem, 11vw, 9rem) 0; }
+    .sec-head { display: grid; grid-template-columns: 1fr auto; align-items: end; gap: 1.2rem 2rem; margin-bottom: clamp(2rem, 5vw, 3.5rem); }
+    .sec-head .label { grid-column: 1 / -1; }
+    .sec-head h2 { font-size: clamp(3rem, 9.5vw, 9rem); }
     .sec-head p { max-width: 34ch; color: var(--muted); margin: 0; }
 
-    /* toolbar (search + chips) */
-    .toolbar { display: flex; justify-content: space-between; align-items: center; gap: 1rem; flex-wrap: wrap; margin-bottom: 1.4rem; }
-    .search { height: 32px; width: 220px; border-radius: 999px; border: 1px solid #3a3a3a; background: transparent; color: var(--fg); padding: 0 1rem; font: inherit; font-size: 0.78rem; }
+    /* služby: rozbalovací řádky (Struxent Expertise) */
+    .svc { border-top: 1px solid var(--line); }
+    .svc-item { border-bottom: 1px solid var(--line); }
+    .svc-head { width: 100%; display: grid; grid-template-columns: 3.5rem 1fr auto; align-items: center; gap: 1rem; padding: 1.3rem 0; background: none; border: 0; color: inherit; text-align: left; cursor: pointer; font: inherit; }
+    .svc-head .n { font-size: .75rem; color: var(--muted); font-weight: 500; }
+    .svc-head h3 { margin: 0; font: 400 clamp(2.2rem, 6.4vw, 5.8rem)/.95 Anton, sans-serif; text-transform: uppercase; transition: color .3s, transform .5s cubic-bezier(.2,.7,.2,1); }
+    .svc-head .plus { width: 42px; height: 42px; border-radius: 50%; border: 1px solid #3a3a3a; display: grid; place-items: center; font-size: 1.3rem; transition: transform .4s cubic-bezier(.6,0,.2,1), background .3s, color .3s, border-color .3s; }
+    .svc-item:hover h3 { color: var(--pink); transform: translateX(.6rem); }
+    .svc-item.open .plus { transform: rotate(45deg); background: var(--pink); color: #000; border-color: var(--pink); }
+    .svc-body { display: grid; grid-template-rows: 0fr; transition: grid-template-rows .55s cubic-bezier(.2,.7,.2,1); }
+    .svc-item.open .svc-body { grid-template-rows: 1fr; }
+    .svc-body > div { overflow: hidden; }
+    .svc-inner { display: grid; grid-template-columns: 3.5rem minmax(0, 48ch) 1fr; gap: 1rem; padding: 0 0 1.8rem; }
+    .svc-inner p { grid-column: 2; margin: 0; color: #cfcfcf; font-size: 1.05rem; }
+    .svc-tags { grid-column: 3; display: flex; flex-wrap: wrap; gap: .4rem; align-content: start; justify-content: flex-end; }
+    .svc-tags span { border: 1px solid #3a3a3a; border-radius: 999px; padding: .4rem .75rem; font-size: .72rem; color: var(--muted); }
+
+    /* postup: vodorovný pin (Struxent System) */
+    .process { padding-bottom: 0; }
+    .process-pin { overflow: hidden; }
+    .process-track { display: flex; gap: 1rem; padding: 0 1rem clamp(5rem, 11vw, 9rem); width: max-content; }
+    .step { flex: none; width: min(78vw, 560px); min-height: min(62vh, 520px); border-radius: var(--r); padding: clamp(1.3rem, 3vw, 2.2rem); display: flex; flex-direction: column; justify-content: space-between; background: var(--panel); border: 1px solid var(--line); }
+    .step-top { display: flex; justify-content: space-between; align-items: start; }
+    .step-num { font: 400 clamp(6rem, 14vw, 11rem)/.8 Anton, sans-serif; color: #1c1c1c; }
+    .step h3 { font: 400 clamp(2.6rem, 6vw, 4.6rem)/.9 Anton, sans-serif; text-transform: uppercase; margin: 0 0 .9rem; }
+    .step p { margin: 0; max-width: 38ch; color: #cfcfcf; font-size: 1.02rem; }
+    .step:nth-child(2) { background: var(--pink); color: #000; border-color: var(--pink); }
+    .step:nth-child(2) p { color: #1a1a1a; }
+    .step:nth-child(2) .step-num { color: rgba(0,0,0,.14); }
+    .step:nth-child(4) { background: var(--fg); color: #000; }
+    .step:nth-child(4) p { color: #222; }
+    .step:nth-child(4) .step-num { color: rgba(0,0,0,.1); }
+    .step .label { color: inherit; opacity: .75; }
+
+    /* projekty: galerie Lenis templates */
+    .toolbar { display: flex; justify-content: space-between; align-items: center; gap: 1rem; flex-wrap: wrap; margin-bottom: 1.3rem; }
+    .search { height: 34px; width: 240px; border-radius: 999px; border: 1px solid #3a3a3a; background: transparent; color: var(--fg); padding: 0 1rem; font: inherit; font-size: .8rem; }
     .search:focus { outline: none; border-color: var(--pink); }
-    .chips { display: flex; gap: 0.35rem; flex-wrap: wrap; }
-    .chip { height: 28px; padding: 0 0.8rem; border-radius: 999px; border: 1px solid #8c8c8c; background: transparent; color: var(--fg); font: 500 0.68rem/1 Roboto, sans-serif; cursor: pointer; transition: all .2s; }
+    .chips { display: flex; gap: .35rem; flex-wrap: wrap; }
+    .chip { height: 30px; padding: 0 .9rem; border-radius: 999px; border: 1px solid #8c8c8c; background: transparent; color: var(--fg); font: 500 .7rem/1 Roboto, sans-serif; cursor: pointer; transition: all .2s; }
     .chip:hover { border-color: var(--pink); color: var(--pink); }
     .chip[aria-pressed="true"] { background: var(--pink); border-color: var(--pink); color: #000; }
-
-    /* cards */
-    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr)); gap: 0.9rem; }
-    .card { position: relative; background: var(--card); border-radius: 6px; overflow: hidden; display: flex; flex-direction: column; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 380px), 1fr)); gap: 1rem; }
+    .card { display: flex; flex-direction: column; gap: .9rem; }
     .card[hidden] { display: none; }
-    .card-img { aspect-ratio: 4 / 3; overflow: hidden; background: #111; }
-    .card-img img { width: 100%; height: 100%; object-fit: cover; transition: transform .8s cubic-bezier(.2,.7,.2,1); }
+    .card-img { position: relative; aspect-ratio: 3 / 2; border-radius: var(--r); overflow: hidden; background: #111; }
+    .card-img img { width: 100%; height: 100%; object-fit: cover; transition: transform .9s cubic-bezier(.2,.7,.2,1); }
     .card:hover .card-img img { transform: scale(1.06); }
-    .card-meta { display: flex; justify-content: space-between; align-items: baseline; gap: 1rem; padding: 0.85rem 0.9rem 1rem; }
-    .card-meta h3 { margin: 0; font-size: 0.95rem; font-weight: 500; }
-    .card-meta span { font-size: 0.72rem; color: var(--muted); }
-    .card .tag { position: absolute; top: 0.7rem; left: 0.7rem; background: var(--pink); color: #000; border-radius: 999px; padding: 0.3rem 0.65rem; font: 700 0.6rem/1 Roboto, sans-serif; text-transform: uppercase; letter-spacing: 0.06em; }
-    .card-art { aspect-ratio: 4 / 3; display: grid; place-items: center; font: 400 clamp(3rem, 7vw, 5rem)/0.85 Anton, sans-serif; text-transform: uppercase; text-align: center; padding: 1rem; }
+    .card-img .tag { position: absolute; top: .8rem; left: .8rem; background: var(--pink); color: #000; border-radius: 999px; padding: .35rem .7rem; font: 700 .62rem/1 Roboto, sans-serif; text-transform: uppercase; letter-spacing: .06em; }
+    .card-img .go { position: absolute; right: .8rem; bottom: .8rem; width: 44px; height: 44px; border-radius: 50%; background: #000; color: var(--pink); display: grid; place-items: center; transform: scale(0); transition: transform .45s cubic-bezier(.6,0,.2,1); }
+    .card:hover .go { transform: scale(1); }
+    .card-meta { display: grid; grid-template-columns: 1fr 1.6fr; gap: 1rem; padding: 0 .2rem; }
+    .card-meta dt { font: 700 .62rem/1 Roboto, sans-serif; text-transform: uppercase; letter-spacing: .1em; color: var(--muted); margin-bottom: .45rem; }
+    .card-meta dd { margin: 0; font-size: .92rem; }
+    .card-meta .name { font: 400 1.6rem/1 Anton, sans-serif; text-transform: uppercase; }
     .empty { color: var(--muted); padding: 2rem 0; }
 
-    /* services list */
-    .svc { border-top: 1px solid var(--line); }
-    .svc-row { display: grid; grid-template-columns: 4rem 1fr minmax(0, 30ch); gap: 1.5rem; align-items: center; padding: 1.4rem 0; border-bottom: 1px solid var(--line); transition: color .3s, padding .4s cubic-bezier(.2,.7,.2,1); }
-    .svc-row:hover { color: var(--pink); padding-left: 1rem; }
-    .svc-row .n { font-size: 0.72rem; color: var(--muted); }
-    .svc-row h3 { margin: 0; font: 400 clamp(2.2rem, 6.5vw, 5.5rem)/0.95 Anton, sans-serif; text-transform: uppercase; }
-    .svc-row p { margin: 0; color: var(--muted); font-size: 0.9rem; }
+    /* Máte projekt? – přejezd */
+    .pan { padding: 0; overflow: hidden; }
+    .pan-line { white-space: nowrap; font: 400 min(38vh, 26vw)/1 Anton, sans-serif; text-transform: uppercase; padding: 6vh 0; will-change: transform; }
+    .pan-line em { font-style: normal; color: var(--pink); }
 
-    /* process: sticky stacking */
-    .steps { display: grid; gap: 0; }
-    .step { position: sticky; top: calc(var(--nav-h) + 1.5rem); min-height: 56vh; border-radius: 10px; padding: clamp(1.5rem, 4vw, 3rem); display: grid; grid-template-rows: auto 1fr auto; margin-bottom: 1.2rem; }
-    .step:nth-child(1) { background: #151515; }
-    .step:nth-child(2) { background: #1d1d1d; top: calc(var(--nav-h) + 2.5rem); }
-    .step:nth-child(3) { background: var(--pink); color: #000; top: calc(var(--nav-h) + 3.5rem); }
-    .step:nth-child(4) { background: var(--fg); color: #000; top: calc(var(--nav-h) + 4.5rem); }
-    .step h3 { font: 400 clamp(3rem, 10vw, 9rem)/0.9 Anton, sans-serif; text-transform: uppercase; margin: 0; align-self: end; }
-    .step p { max-width: 44ch; margin: 1rem 0 0; font-size: 1rem; }
-
-    /* footer */
-    .foot { padding: clamp(5rem, 12vw, 9rem) 0 1.5rem; text-align: center; background: radial-gradient(100% 60% at 50% 0%, #2a1417 0%, #000 65%); }
-    .foot h2 { font-size: clamp(3.4rem, 12vw, 12rem); }
-    .foot h2 em { font-style: normal; color: var(--pink); }
-    .foot .pill-form { margin: 2.4rem auto 0; }
-    .foot-links { display: flex; justify-content: center; flex-wrap: wrap; gap: 0.3rem 1.2rem; margin-top: 4rem; }
-    .foot-links a { padding: 0.5rem 0.2rem; }
+    /* patička */
+    .foot { padding: 0 .75rem .75rem; }
+    .foot-card { border-radius: var(--r); background: #070707; border: 1px solid var(--line); padding: clamp(1.4rem, 4vw, 3.5rem); position: relative; overflow: hidden; isolation: isolate; }
+    .foot-card .hero-glow { top: 0; opacity: .7; }
+    .foot-grid { display: grid; grid-template-columns: 1fr minmax(0, 560px); gap: clamp(2rem, 5vw, 5rem); align-items: start; }
+    .foot-title { font-size: clamp(3.4rem, 9vw, 9rem); margin-top: 1rem; }
+    .foot-sub { color: #cfcfcf; max-width: 36ch; margin: 1.2rem 0 1.8rem; }
+    .foot-contacts { display: flex; flex-direction: column; gap: .35rem; }
+    .foot-contacts a { font: 400 clamp(1.4rem, 2.6vw, 2.2rem)/1.1 Anton, sans-serif; text-transform: uppercase; width: fit-content; background: linear-gradient(var(--pink), var(--pink)) 0 100% / 0 2px no-repeat; transition: background-size .4s, color .3s; }
+    .foot-contacts a:hover { color: var(--pink); background-size: 100% 2px; }
+    .form { background: rgba(20,20,20,.75); border: 1px solid #242424; border-radius: 14px; padding: clamp(1.2rem, 3vw, 2rem); display: grid; gap: .8rem; }
+    .form h3 { margin: 0 0 .3rem; font: 400 1.9rem/1 Anton, sans-serif; text-transform: uppercase; }
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: .8rem; }
+    .form label { display: grid; gap: .4rem; font: 700 .64rem/1 Roboto, sans-serif; text-transform: uppercase; letter-spacing: .09em; color: var(--muted); }
+    .form input, .form select, .form textarea { width: 100%; border: 1px solid #333; background: #000; color: var(--fg); border-radius: 12px; padding: .75rem .9rem; font: 400 .95rem/1.3 Roboto, sans-serif; text-transform: none; letter-spacing: 0; }
+    .form input, .form select { border-radius: 999px; height: 44px; padding: 0 1rem; }
+    .form input:focus, .form select:focus, .form textarea:focus { outline: none; border-color: var(--pink); }
+    .form-note { margin: 0; font-size: .75rem; color: var(--muted); }
+    .form .pill { justify-self: start; }
+    #inquiryStatus { margin: 0; font-size: .82rem; color: var(--pink); }
+    #inquiryStatus:empty { display: none; }
+    .foot-bottom { display: flex; justify-content: space-between; align-items: center; gap: 1rem; flex-wrap: wrap; margin-top: clamp(3rem, 7vw, 5rem); padding-top: 1.2rem; border-top: 1px solid var(--line); }
+    .foot-links { display: flex; flex-wrap: wrap; gap: .1rem .4rem; }
+    .foot-links a { padding: .5rem; }
     .foot-links a:hover { color: var(--pink); }
-    .foot-mark { font: 400 22.5vw/0.8 Anton, sans-serif; text-transform: uppercase; color: #141414; margin-top: 3rem; white-space: nowrap; user-select: none; }
-    .foot-copy { display: flex; justify-content: space-between; color: var(--muted); font-size: 0.72rem; padding-top: 1rem; }
+    .foot-copy { color: var(--muted); font-size: .75rem; }
+    .foot-mark { font: 400 20.5vw/.78 Anton, sans-serif; text-transform: uppercase; color: #161616; text-align: center; white-space: nowrap; margin-top: 2rem; user-select: none; }
+
+    /* cookie lišta */
+    .cookie { position: fixed; left: 1rem; right: 1rem; bottom: 1rem; z-index: 70; max-width: 560px; margin: 0 auto; display: flex; align-items: center; gap: 1rem; background: #111; border: 1px solid #2a2a2a; border-radius: 999px; padding: .5rem .5rem .5rem 1.2rem; }
+    .cookie[hidden] { display: none; }
+    .cookie p { margin: 0; font-size: .78rem; flex: 1; }
+    .cookie a { color: var(--pink); }
+    .cookie button { height: 34px; }
 
     .rv { opacity: 0; transform: translateY(40px); }
     @media (prefers-reduced-motion: reduce) { .rv { opacity: 1; transform: none; } }
-    @media (max-width: 720px) {
-      .nav-group:first-child a:not(:first-child) { display: none; }
-      .nav-group:last-child a:not(:last-child) { display: none; }
-      .svc-row { grid-template-columns: 2.2rem 1fr; }
-      .svc-row p { grid-column: 2; }
-      .search { width: 100%; }
-      .step { min-height: 48vh; }
+
+    @media (max-width: 900px) {
+      .nav-group { display: none; }
+      .nav { grid-template-columns: 1fr auto; }
+      .nav-mark { justify-self: start; }
+      .burger { display: block; }
+      .hero-foot, .foot-grid, .sec-head { grid-template-columns: 1fr; }
+      .svc-inner { grid-template-columns: 1fr; padding-left: 0; }
+      .svc-inner p, .svc-tags { grid-column: 1; justify-content: flex-start; }
+      .svc-head { grid-template-columns: 2.2rem 1fr auto; }
+      .form-grid { grid-template-columns: 1fr; }
+      .cookie { border-radius: 16px; flex-direction: column; align-items: stretch; padding: 1rem; }
+      .process-track { flex-direction: column; width: auto; }
+      .step { width: 100%; min-height: 0; gap: 2.5rem; }
     }
   </style>
 </head>
 <body>
-  <header class="nav">
-    <nav class="nav-group eyebrow" aria-label="Hlavní">
-      <a href="#projekty">Projekty</a>
+  <header class="nav" id="nav">
+    <nav class="nav-group caps" aria-label="Hlavní navigace">
       <a href="#sluzby">Služby</a>
       <a href="#postup">Postup</a>
-    </nav>
-    <a class="nav-mark" href="#" aria-label="Softlab Interactive, nahoru">S</a>
-    <nav class="nav-group eyebrow" aria-label="Další">
-      <a href="/files/">Podklady</a>
-      <a href="/admin/files">Přihlášení</a>
+      <a href="#projekty">Projekty</a>
       <a href="#kontakt">Kontakt</a>
     </nav>
+    <a class="nav-mark" href="#top" aria-label="Softlab Interactive, úvod">S</a>
+    <nav class="nav-group caps" aria-label="Portál">
+      <a href="/files/">Podklady</a>
+      <a href="/admin/files">Přihlášení</a>
+      <a class="pill pill-pink" href="#poptavka">Poptat projekt <span class="ico" aria-hidden="true">↗</span></a>
+    </nav>
+    <button class="burger" id="burger" aria-expanded="false" aria-controls="mnav">Menu</button>
   </header>
+  <div class="mnav" id="mnav" hidden>
+    <a href="#sluzby">Služby</a>
+    <a href="#postup">Postup</a>
+    <a href="#projekty">Projekty</a>
+    <a href="#kontakt">Kontakt</a>
+    <a href="/files/">Podklady</a>
+    <a href="/admin/files">Přihlášení</a>
+  </div>
   <div class="progress" id="progress" aria-hidden="true"></div>
 
-  <main>
-    <section class="hero">
-      <h1 class="display"><span class="row"><span>Softlab</span></span><span class="row"><span>Interactive</span></span></h1>
-      <p class="hero-sub">Weby a interní systémy na míru.</p>
-      <form class="pill-form" data-mail>
-        <input type="email" name="email" placeholder="Váš e-mail" autocomplete="email" required aria-label="Váš e-mail">
-        <button class="btn-pink" type="submit">Poptat projekt</button>
-      </form>
-      <p class="hero-note">Ozveme se do 24 hodin. Žádný spam, žádné newslettery.</p>
+  <main id="top">
+    <section class="hero" style="padding-bottom:.75rem">
+      <div class="hero-card">
+        <div class="hero-glow" aria-hidden="true"></div>
+        <svg class="hero-rings" viewBox="0 0 1000 1000" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+          <g fill="none" stroke="#ff98a2" stroke-width="1">
+            <circle cx="500" cy="600" r="160"/><circle cx="500" cy="600" r="260" opacity=".6"/><circle cx="500" cy="600" r="370" opacity=".35"/><circle cx="500" cy="600" r="490" opacity=".18"/>
+          </g>
+        </svg>
+        <div class="hero-top">
+          <span class="hero-badge"><b>S</b> Softlab Interactive</span>
+          <span class="label">Weby / E-shopy / Systémy</span>
+        </div>
+        <div>
+          <h1 class="display">
+            <span class="row"><span>Weby &amp;</span></span>
+            <span class="row"><span>interní systémy</span></span>
+            <span class="row"><span>na míru.</span></span>
+          </h1>
+          <div class="hero-foot">
+            <p>Jsme Softlab Interactive. Firmám stavíme rychlé weby a software, který kopíruje jejich procesy, ne naopak.</p>
+            <a class="pill pill-pink" href="#poptavka">Poptat projekt <span class="ico" aria-hidden="true">↗</span></a>
+          </div>
+        </div>
+      </div>
     </section>
 
     <div class="ticker" aria-hidden="true">
       <div class="ticker-track" id="ticker">
-        <span>Weby</span><span>E-shopy</span><span>Interní systémy</span><span>Automatizace</span><span>Podpora a rozvoj</span>
-        <span>Weby</span><span>E-shopy</span><span>Interní systémy</span><span>Automatizace</span><span>Podpora a rozvoj</span>
+        <span>Weby</span><i></i><span>E-shopy</span><i></i><span>Interní systémy</span><i></i><span>Automatizace</span><i></i><span>Podpora a rozvoj</span><i></i>
+        <span>Weby</span><i></i><span>E-shopy</span><i></i><span>Interní systémy</span><i></i><span>Automatizace</span><i></i><span>Podpora a rozvoj</span><i></i>
       </div>
     </div>
 
-    <section id="projekty">
+    <!-- SLUŽBY -->
+    <section id="sluzby">
       <div class="wrap">
         <div class="sec-head rv">
-          <h2 class="display">Projekty</h2>
-          <p>Ručně stavěné weby a systémy. Každý má svůj charakter. Klikněte a prohlédněte si je naživo.</p>
+          <span class="label">Služby</span>
+          <h2 class="display">Co stavíme</h2>
         </div>
-        <div class="toolbar rv">
-          <input class="search" id="search" type="search" placeholder="Hledat" aria-label="Hledat projekt">
-          <div class="chips" role="group" aria-label="Filtr kategorie">
-            <button class="chip" type="button" data-f="all" aria-pressed="true">Vše</button>
-            <button class="chip" type="button" data-f="web" aria-pressed="false">Web</button>
-            <button class="chip" type="button" data-f="brand" aria-pressed="false">Značka</button>
-            <button class="chip" type="button" data-f="system" aria-pressed="false">Systém</button>
+        <div class="svc" id="svc">
+          <div class="svc-item open rv">
+            <button class="svc-head" aria-expanded="true"><span class="n">01</span><h3>Weby</h3><span class="plus" aria-hidden="true">+</span></button>
+            <div class="svc-body"><div><div class="svc-inner">
+              <p>Prezentace a kampaně, které prodávají. Od návrhu po nasazení, rychlé a měřitelné od prvního dne.</p>
+              <div class="svc-tags"><span>UX a design</span><span>Copy</span><span>Vývoj</span><span>SEO základ</span><span>Analytika</span></div>
+            </div></div></div>
+          </div>
+          <div class="svc-item rv">
+            <button class="svc-head" aria-expanded="false"><span class="n">02</span><h3>E-shopy</h3><span class="plus" aria-hidden="true">+</span></button>
+            <div class="svc-body"><div><div class="svc-inner">
+              <p>Výkonné obchody bez krabicových kompromisů. Ceny a dostupnost přímo z vašich systémů.</p>
+              <div class="svc-tags"><span>Katalog a košík</span><span>Platby</span><span>Napojení na ERP</span><span>Správa obsahu</span></div>
+            </div></div></div>
+          </div>
+          <div class="svc-item rv">
+            <button class="svc-head" aria-expanded="false"><span class="n">03</span><h3>Interní systémy</h3><span class="plus" aria-hidden="true">+</span></button>
+            <div class="svc-body"><div><div class="svc-inner">
+              <p>Aplikace přesně podle vašeho provozu: evidence, plánování, schvalování a reporty na jednom místě.</p>
+              <div class="svc-tags"><span>Analýza procesů</span><span>CRM a evidence</span><span>Plánování</span><span>Reporty</span></div>
+            </div></div></div>
+          </div>
+          <div class="svc-item rv">
+            <button class="svc-head" aria-expanded="false"><span class="n">04</span><h3>Automatizace</h3><span class="plus" aria-hidden="true">+</span></button>
+            <div class="svc-body"><div><div class="svc-inner">
+              <p>Propojíme nástroje, které už používáte. Data tečou sama a lidé dělají práci, která má smysl.</p>
+              <div class="svc-tags"><span>Integrace API</span><span>Synchronizace dat</span><span>Notifikace</span><span>Migrace</span></div>
+            </div></div></div>
+          </div>
+          <div class="svc-item rv">
+            <button class="svc-head" aria-expanded="false"><span class="n">05</span><h3>Podpora a rozvoj</h3><span class="plus" aria-hidden="true">+</span></button>
+            <div class="svc-body"><div><div class="svc-inner">
+              <p>Po spuštění neodcházíme. Hlídáme provoz, měříme výsledky a web i systém dál rozvíjíme s vámi.</p>
+              <div class="svc-tags"><span>Monitoring</span><span>Zálohy</span><span>Úpravy a rozvoj</span><span>Konzultace</span></div>
+            </div></div></div>
           </div>
         </div>
-        <div class="grid" id="grid">
-          <a class="card rv" data-cat="web" href="https://www.alerta.cz/" target="_blank" rel="noopener noreferrer">
-            <span class="tag">Featured</span>
-            <div class="card-img"><img src="../showcase/alerta.jpg" alt="Náhled webu Alerta" loading="lazy" width="1440" height="960"></div>
-            <div class="card-meta"><h3>Alerta</h3><span>Partner T-Mobile</span></div>
+      </div>
+    </section>
+
+    <!-- POSTUP -->
+    <section class="process" id="postup">
+      <div class="wrap">
+        <div class="sec-head rv">
+          <span class="label">Postup</span>
+          <h2 class="display">Jak pracujeme</h2>
+          <p>Čtyři kroky od první schůzky k běžícímu provozu.</p>
+        </div>
+      </div>
+      <div class="process-pin" id="processPin">
+        <ol class="process-track" id="processTrack" style="list-style:none;margin:0">
+          <li class="step"><div class="step-top"><span class="label">Krok</span><span class="step-num" aria-hidden="true">01</span></div><div><h3>Analýza</h3><p>Projdeme vaše procesy, čísla a cíle. Výstupem je zadání, kterému rozumí obě strany.</p></div></li>
+          <li class="step"><div class="step-top"><span class="label">Krok</span><span class="step-num" aria-hidden="true">02</span></div><div><h3>Návrh</h3><p>Klikatelný prototyp dřív, než napíšeme první řádek kódu.</p></div></li>
+          <li class="step"><div class="step-top"><span class="label">Krok</span><span class="step-num" aria-hidden="true">03</span></div><div><h3>Vývoj</h3><p>Stavíme po částech a každý týden ukazujeme funkční výsledek.</p></div></li>
+          <li class="step"><div class="step-top"><span class="label">Krok</span><span class="step-num" aria-hidden="true">04</span></div><div><h3>Provoz</h3><p>Nasadíme, měříme a rozvíjíme. Web ani systém nekončí spuštěním.</p></div></li>
+        </ol>
+      </div>
+    </section>
+
+    <!-- PROJEKTY -->
+    <section id="projekty" style="padding-top:0">
+      <div class="wrap">
+        <div class="sec-head rv">
+          <span class="label">Reference</span>
+          <h2 class="display">Vybrané projekty</h2>
+          <p>Každý web má svůj vlastní charakter. Prohlédněte si je naživo.</p>
+        </div>
+        <div class="toolbar rv">
+          <input class="search" id="search" type="search" placeholder="Hledat projekt" aria-label="Hledat projekt">
+          <div class="chips" role="group" aria-label="Filtr">
+            <button class="chip" type="button" data-f="all" aria-pressed="true">Vše</button>
+            <button class="chip" type="button" data-f="firma" aria-pressed="false">Firmy</button>
+            <button class="chip" type="button" data-f="znacka" aria-pressed="false">Značky</button>
+          </div>
+        </div>
+        <div class="grid">
+          <a class="card rv" data-cat="firma" href="https://www.alerta.cz/" target="_blank" rel="noopener noreferrer" aria-label="Alerta, otevřít web v nové kartě">
+            <div class="card-img"><span class="tag">Partner T-Mobile</span><img src="../showcase/alerta.jpg" width="1440" height="960" loading="lazy" decoding="async" alt="Náhled úvodní stránky Alerta"><span class="go" aria-hidden="true">↗</span></div>
+            <dl class="card-meta"><div><dt>Projekt</dt><dd class="name">Alerta</dd></div><div><dt>Popis</dt><dd>Web sítě partnerských prodejen T-Mobile.</dd></div></dl>
           </a>
-          <a class="card rv" data-cat="web" href="https://www.helion.cz/" target="_blank" rel="noopener noreferrer">
-            <div class="card-img"><img src="../showcase/helion.jpg" alt="Náhled webu Helion" loading="lazy" width="1440" height="960"></div>
-            <div class="card-meta"><h3>Helion</h3><span>Fotovoltaika</span></div>
+          <a class="card rv" data-cat="firma" href="https://www.helion.cz/" target="_blank" rel="noopener noreferrer" aria-label="Helion, otevřít web v nové kartě">
+            <div class="card-img"><span class="tag">Fotovoltaika</span><img src="../showcase/helion.jpg" width="1440" height="960" loading="lazy" decoding="async" alt="Náhled úvodní stránky Helion"><span class="go" aria-hidden="true">↗</span></div>
+            <dl class="card-meta"><div><dt>Projekt</dt><dd class="name">Helion</dd></div><div><dt>Popis</dt><dd>Fotovoltaika, chytrá energie a servis.</dd></div></dl>
           </a>
-          <a class="card rv" data-cat="brand" href="https://naoku.cz/" target="_blank" rel="noopener noreferrer">
-            <div class="card-img"><img src="../showcase/naoku.jpg" alt="Náhled webu naOku" loading="lazy" width="1440" height="960"></div>
-            <div class="card-meta"><h3>naOku</h3><span>Autorská značka</span></div>
-          </a>
-          <a class="card rv" data-cat="system" href="#kontakt">
-            <div class="card-art" style="background:var(--pink);color:#000">Váš<br>systém</div>
-            <div class="card-meta"><h3>Interní systém na míru</h3><span>Pod NDA</span></div>
+          <a class="card rv" data-cat="znacka" href="https://naoku.cz/" target="_blank" rel="noopener noreferrer" aria-label="naOku, otevřít web v nové kartě">
+            <div class="card-img"><span class="tag">Autorská značka</span><img src="../showcase/naoku.jpg" width="1440" height="960" loading="lazy" decoding="async" alt="Náhled úvodní stránky naOku"><span class="go" aria-hidden="true">↗</span></div>
+            <dl class="card-meta"><div><dt>Projekt</dt><dd class="name">naOku</dd></div><div><dt>Popis</dt><dd>Ručně háčkované kousky z přírodních materiálů.</dd></div></dl>
           </a>
         </div>
         <p class="empty" id="empty" hidden>Nic jsme nenašli. Zkuste jiný filtr.</p>
       </div>
     </section>
 
-    <section id="sluzby">
-      <div class="wrap">
-        <div class="sec-head rv">
-          <h2 class="display">Služby</h2>
-          <p>Od prvního návrhu po dlouhodobý provoz. Jeden tým, žádné přehazování odpovědnosti.</p>
-        </div>
-        <div class="svc">
-          <div class="svc-row rv"><span class="n">01</span><h3>Weby</h3><p>Rychlé prezentace, které prodávají a dají se snadno spravovat.</p></div>
-          <div class="svc-row rv"><span class="n">02</span><h3>E-shopy</h3><p>Obchody napojené na sklad, platby i dopravce.</p></div>
-          <div class="svc-row rv"><span class="n">03</span><h3>Interní systémy</h3><p>Software, který kopíruje procesy vaší firmy, ne naopak.</p></div>
-          <div class="svc-row rv"><span class="n">04</span><h3>Automatizace</h3><p>Propojíme nástroje, které teď přepisujete ručně.</p></div>
-          <div class="svc-row rv"><span class="n">05</span><h3>Podpora</h3><p>Hlídáme, aktualizujeme a rozvíjíme dál.</p></div>
-        </div>
-      </div>
-    </section>
-
-    <section id="postup">
-      <div class="wrap">
-        <div class="sec-head rv">
-          <h2 class="display">Postup</h2>
-          <p>Čtyři kroky. Víte, co se děje, kolik to stojí a kdy to bude hotové.</p>
-        </div>
-        <div class="steps">
-          <article class="step"><span class="eyebrow">Krok 01</span><h3>Analýza</h3><p>Projdeme vaše procesy a řekneme na rovinu, co má smysl stavět a co ne.</p></article>
-          <article class="step"><span class="eyebrow">Krok 02</span><h3>Návrh</h3><p>Klikací prototyp, na kterém si vše vyzkoušíte ještě před první řádkou kódu.</p></article>
-          <article class="step"><span class="eyebrow">Krok 03</span><h3>Vývoj</h3><p>Stavíme v krátkých cyklech. Každé dva týdny vidíte funkční verzi.</p></article>
-          <article class="step"><span class="eyebrow">Krok 04</span><h3>Provoz</h3><p>Spuštění, zaškolení a dlouhodobá péče. Nezmizíme po předání.</p></article>
-        </div>
-      </div>
+    <!-- MÁTE PROJEKT? -->
+    <section class="pan" id="pan">
+      <h2 class="sr-only">Máte projekt?</h2>
+      <div class="pan-line" id="panLine" aria-hidden="true">Máte <em>projekt?</em></div>
     </section>
   </main>
 
   <footer class="foot" id="kontakt">
-    <div class="wrap">
-      <h2 class="display rv">Máte<br><em>projekt?</em></h2>
-      <form class="pill-form rv" data-mail>
-        <input type="email" name="email" placeholder="Váš e-mail" autocomplete="email" required aria-label="Váš e-mail">
-        <button class="btn-pink" type="submit">Ozvěte se mi</button>
-      </form>
-      <nav class="foot-links eyebrow" aria-label="Patička">
-        <a href="mailto:studio@softlab.cz">studio@softlab.cz</a>
-        <a href="tel:+420728521533">+420 728 521 533</a>
-        <a href="/files/">Předání podkladů</a>
-        <a href="/gdpr/">Ochrana údajů</a>
-        <a href="/">Verze 1</a>
-      </nav>
+    <div class="foot-card">
+      <div class="hero-glow" aria-hidden="true"></div>
+      <div class="foot-grid">
+        <div class="rv">
+          <span class="label">Kontakt</span>
+          <h2 class="display foot-title">Pojďme ho<br>postavit.</h2>
+          <p class="foot-sub">Napište nám dvě věty o tom, co potřebujete. Ozveme se do 24 hodin.</p>
+          <div class="foot-contacts">
+            <a href="mailto:studio@softlab.cz?subject=Popt%C3%A1vka%20projektu">studio@softlab.cz</a>
+            <a href="tel:+420728521533">+420 728 521 533</a>
+          </div>
+        </div>
+        <form class="form rv" id="poptavka">
+          <h3>Povězte nám o projektu</h3>
+          <div class="form-grid">
+            <label>Jméno<input name="name" autocomplete="name" required maxlength="120"></label>
+            <label>E-mail<input name="email" type="email" autocomplete="email" required maxlength="254"></label>
+            <label>Telefon<input name="phone" type="tel" autocomplete="tel" required maxlength="40"></label>
+            <label>Co od nás potřebujete?<select name="service" required><option value="">Vyberte službu</option><option>Web</option><option>E-shop</option><option>Interní systém</option><option>Automatizace</option><option>Podpora a rozvoj</option><option>Něco jiného</option></select></label>
+          </div>
+          <label>Krátký popis (nepovinné)<textarea name="description" rows="4" maxlength="3000"></textarea></label>
+          <p class="form-note">Tlačítko otevře váš e-mail s vyplněnou poptávkou. Odeslání potvrdíte v e-mailové aplikaci.</p>
+          <button class="pill pill-pink" type="submit">Připravit poptávku <span class="ico" aria-hidden="true">↗</span></button>
+          <p id="inquiryStatus" role="status"></p>
+        </form>
+      </div>
+      <div class="foot-bottom">
+        <nav class="foot-links caps" aria-label="Patička">
+          <a href="#sluzby">Služby</a>
+          <a href="#postup">Postup</a>
+          <a href="#projekty">Projekty</a>
+          <a href="/files/">Předání podkladů</a>
+          <a href="/gdpr/">Ochrana údajů</a>
+          <a href="/admin/files">Přihlášení</a>
+        </nav>
+        <span class="foot-copy">© <span id="year">2026</span> Softlab Interactive</span>
+      </div>
       <div class="foot-mark" aria-hidden="true">Softlab</div>
-      <div class="foot-copy"><span>© <span id="year">2026</span> Softlab Interactive</span><span>Smooth scroll by Lenis</span></div>
     </div>
   </footer>
+
+  <div class="cookie" id="cookieBar" role="region" aria-label="Informace o cookies" hidden>
+    <p>Používáme jen technické cookies nezbytné pro chod webu. <a href="/gdpr/">Více</a></p>
+    <button class="pill pill-pink" type="button" id="cookieOk">Rozumím</button>
+  </div>
 
   <script src="../vendor/lenis.min.js"></script>
   <script src="../vendor/gsap.min.js"></script>
@@ -262,18 +432,31 @@
     var isTouch = "ontouchstart" in window || navigator.maxTouchPoints > 0;
     document.getElementById("year").textContent = new Date().getFullYear();
 
-    /* mail pill forms -> mailto */
-    document.querySelectorAll("[data-mail]").forEach(function (f) {
-      f.addEventListener("submit", function (e) {
-        e.preventDefault();
-        if (!f.reportValidity()) return;
-        var mail = f.elements.email.value;
-        location.href = "mailto:studio@softlab.cz?subject=" + encodeURIComponent("Poptávka projektu") +
-          "&body=" + encodeURIComponent("Dobrý den,\n\nmám zájem o spolupráci. Ozvěte se mi prosím na " + mail + ".\n\n");
+    /* cookie */
+    try { if (localStorage.getItem("sl-cookies") !== "1") document.getElementById("cookieBar").hidden = false; } catch (e) {}
+    document.getElementById("cookieOk").addEventListener("click", function () {
+      document.getElementById("cookieBar").hidden = true;
+      try { localStorage.setItem("sl-cookies", "1"); } catch (e) {}
+    });
+
+    /* mobilní menu */
+    var burger = document.getElementById("burger"), mnav = document.getElementById("mnav");
+    function setMenu(open) { mnav.hidden = !open; burger.setAttribute("aria-expanded", open); burger.textContent = open ? "Zavřít" : "Menu"; }
+    burger.addEventListener("click", function () { setMenu(mnav.hidden); });
+    mnav.addEventListener("click", function (e) { if (e.target.tagName === "A") setMenu(false); });
+    document.addEventListener("keydown", function (e) { if (e.key === "Escape") setMenu(false); });
+
+    /* služby: akordeon */
+    document.querySelectorAll(".svc-head").forEach(function (b) {
+      b.addEventListener("click", function () {
+        var item = b.parentNode, open = !item.classList.contains("open");
+        document.querySelectorAll(".svc-item").forEach(function (i) { i.classList.remove("open"); i.firstElementChild.setAttribute("aria-expanded", "false"); });
+        if (open) { item.classList.add("open"); b.setAttribute("aria-expanded", "true"); }
+        if (window.ScrollTrigger) setTimeout(function () { ScrollTrigger.refresh(); }, 600);
       });
     });
 
-    /* filter + search */
+    /* projekty: filtr + hledání */
     var chips = document.querySelectorAll(".chip"), cards = document.querySelectorAll(".card"), q = document.getElementById("search"), cat = "all";
     function apply() {
       var term = q.value.trim().toLowerCase(), shown = 0;
@@ -293,59 +476,82 @@
     });
     q.addEventListener("input", apply);
 
-    var progress = document.getElementById("progress");
-    function setProgress() {
+    /* poptávka -> mailto (stejně jako v1) */
+    var inquiry = document.getElementById("poptavka");
+    inquiry.addEventListener("submit", function (e) {
+      e.preventDefault();
+      if (!inquiry.reportValidity()) return;
+      var d = new FormData(inquiry);
+      var body = "Jméno: " + d.get("name") + "\nE-mail: " + d.get("email") + "\nTelefon: " + d.get("phone") + "\nSlužba: " + d.get("service") + "\n\n" + d.get("description");
+      location.href = "mailto:studio@softlab.cz?subject=" + encodeURIComponent("Poptávka: " + d.get("service")) + "&body=" + encodeURIComponent(body);
+      document.getElementById("inquiryStatus").textContent = "Poptávka je připravená pro e-mailovou aplikaci. Pokud se neotevřela, napište na studio@softlab.cz. Údaje zůstávají ve formuláři.";
+    });
+
+    var nav = document.getElementById("nav"), progress = document.getElementById("progress");
+    function onScroll() {
       var max = document.documentElement.scrollHeight - innerHeight;
       progress.style.transform = "scaleX(" + (max > 0 ? scrollY / max : 0) + ")";
+      nav.classList.toggle("scrolled", scrollY > 40);
     }
+    addEventListener("scroll", onScroll, { passive: true });
+    onScroll();
 
-    if (reduce || !window.gsap) {
-      addEventListener("scroll", setProgress, { passive: true });
-      return;
-    }
+    if (reduce || !window.gsap) return;
     gsap.registerPlugin(ScrollTrigger);
+    if (isTouch) { ScrollTrigger.config({ ignoreMobileResize: true }); }
 
     var lenis = null;
     if (!isTouch && window.Lenis) {
-      lenis = new Lenis({ lerp: 0.1, anchors: { offset: -60, duration: 1.6 } });
+      lenis = new Lenis({ lerp: 0.1, anchors: { offset: -70, duration: 1.8 } });
       lenis.on("scroll", ScrollTrigger.update);
       gsap.ticker.add(function (t) { lenis.raf(t * 1000); });
       gsap.ticker.lagSmoothing(0);
-      document.querySelector(".nav-mark").addEventListener("click", function (e) { e.preventDefault(); lenis.scrollTo(0, { duration: 1.6 }); });
     }
-    gsap.ticker.add(setProgress);
 
-    /* hero intro */
-    gsap.from(".hero h1 .row > span", { yPercent: 110, duration: 1.2, ease: "expo.out", stagger: 0.1, delay: 0.1 });
-    gsap.from(".hero-sub, .hero .pill-form, .hero-note", { opacity: 0, y: 20, duration: 0.9, ease: "power3.out", stagger: 0.08, delay: 0.5 });
-    /* hero scale-out on scroll */
-    gsap.to(".hero h1", { scale: 0.86, opacity: 0.25, ease: "none", scrollTrigger: { trigger: ".hero", start: "top top", end: "bottom top", scrub: true } });
+    /* hero */
+    gsap.from(".hero h1 .row > span", { yPercent: 115, duration: 1.3, ease: "expo.out", stagger: 0.09, delay: 0.1 });
+    gsap.from(".hero-top, .hero-foot", { opacity: 0, y: 20, duration: 1, ease: "power3.out", stagger: 0.1, delay: 0.55 });
+    gsap.from(".hero-glow", { scale: 0.4, opacity: 0, duration: 2, ease: "expo.out" });
+    gsap.to(".hero-card", { scale: 0.94, borderRadius: 34, ease: "none", scrollTrigger: { trigger: ".hero", start: "top top", end: "bottom top", scrub: true } });
+    gsap.to(".hero-rings", { rotate: 25, scale: 1.25, ease: "none", scrollTrigger: { trigger: ".hero", start: "top top", end: "bottom top", scrub: true } });
 
     /* reveals */
     gsap.utils.toArray(".rv").forEach(function (el) {
       gsap.to(el, { opacity: 1, y: 0, duration: 1, ease: "power3.out", scrollTrigger: { trigger: el, start: "top 90%", once: true } });
     });
 
-    /* velocity ticker */
+    /* ticker reaguje na rychlost */
     var track = document.getElementById("ticker"), x = 0, half = 0;
     function measure() { half = track.scrollWidth / 2; }
     measure(); addEventListener("resize", measure);
     gsap.ticker.add(function () {
       var v = lenis ? Math.abs(lenis.velocity) : 0;
-      x -= 0.6 + Math.min(v * 0.25, 12);
+      x -= 0.7 + Math.min(v * 0.3, 14);
       if (-x >= half) x += half;
       track.style.transform = "translate3d(" + x + "px,0,0)";
     });
 
-    /* process steps shrink as the next one covers them */
-    gsap.utils.toArray(".step").forEach(function (s, i, all) {
-      if (i === all.length - 1) return;
-      gsap.to(s, { scale: 0.94, filter: "brightness(0.6)", ease: "none",
-        scrollTrigger: { trigger: all[i + 1], start: "top bottom", end: "top 20%", scrub: true } });
+    var mm = gsap.matchMedia();
+    /* postup: vodorovný pin na desktopu (piny v pořadí dokumentu) */
+    mm.add("(min-width: 901px)", function () {
+      var pt = document.getElementById("processTrack");
+      gsap.to(pt, {
+        x: function () { return -(pt.scrollWidth - innerWidth); },
+        ease: "none",
+        scrollTrigger: { trigger: "#processPin", start: "center center", end: function () { return "+=" + (pt.scrollWidth - innerWidth); }, pin: true, scrub: 1, anticipatePin: 1, invalidateOnRefresh: true }
+      });
     });
 
-    /* footer mark rises */
-    gsap.from(".foot-mark", { yPercent: 40, ease: "none", scrollTrigger: { trigger: ".foot-mark", start: "top bottom", end: "bottom bottom", scrub: true } });
+    /* Máte projekt? – obří přejezd */
+    var pan = document.getElementById("panLine");
+    gsap.fromTo(pan, { x: function () { return innerWidth * 0.9; } }, {
+      x: function () { return -(pan.scrollWidth - innerWidth * 0.1); },
+      ease: "none",
+      scrollTrigger: { trigger: "#pan", start: "top top", end: function () { return "+=" + pan.scrollWidth * 0.8; }, pin: true, scrub: 1, anticipatePin: 1, invalidateOnRefresh: true }
+    });
+
+    /* patička: wordmark vyjíždí */
+    gsap.from(".foot-mark", { yPercent: 45, ease: "none", scrollTrigger: { trigger: ".foot-mark", start: "top bottom", end: "bottom bottom", scrub: true } });
   })();
   </script>
 </body>
