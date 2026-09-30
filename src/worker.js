@@ -10,6 +10,8 @@ import { adminAppHtml, adminLoginHtml } from "./admin-ui.js";
 
 const SESSION_COOKIE = "sl_admin";
 const SESSION_HOURS = 8;
+const REMEMBER_DAYS = 30;
+const VAULT_COOKIE = "sl_vault";
 const REF_ALPHABET = "ABCDEFGHJKMNPQRSTUVWXYZ23456789"; // bez záměnných znaků
 const SUBMISSION_MAX_AGE_MS = 2 * 60 * 60 * 1000; // okno pro dokončení uploadu
 
@@ -150,28 +152,43 @@ async function timingSafeEq(a, b) {
   return crypto.subtle.timingSafeEqual(ha, hb);
 }
 
-async function makeSession(env) {
-  const exp = Date.now() + SESSION_HOURS * 3600 * 1000;
+/* Podepsaný token "exp.nonce.sig". Účel je součástí podpisu, takže admin token nejde použít
+   jako trezorový. Trezorový podpis zahrnuje i VAULT_PASSWORD: změna hesla zneplatní zapamatovaná zařízení. */
+function tokenData(env, purpose, exp, nonce) {
+  return purpose + "." + exp + "." + nonce + (purpose === "vault" ? "." + (env.VAULT_PASSWORD || "") : "");
+}
+
+async function makeToken(env, purpose, seconds) {
+  const exp = Date.now() + seconds * 1000;
   const nonce = randomId(16);
-  const sig = await hmacHex(env.SESSION_SECRET, exp + "." + nonce);
+  const sig = await hmacHex(env.SESSION_SECRET, tokenData(env, purpose, exp, nonce));
   return exp + "." + nonce + "." + sig;
 }
 
-async function isAuthed(request, env) {
+async function hasToken(request, env, cookieName, purpose) {
   if (!env.SESSION_SECRET) return false;
   const cookie = request.headers.get("Cookie") || "";
-  const m = cookie.match(new RegExp("(?:^|;\\s*)" + SESSION_COOKIE + "=([^;]+)"));
+  const m = cookie.match(new RegExp("(?:^|;\\s*)" + cookieName + "=([^;]+)"));
   if (!m) return false;
   const parts = m[1].split(".");
   if (parts.length !== 3) return false;
   const [exp, nonce, sig] = parts;
   if (!/^\d+$/.test(exp) || Date.now() > Number(exp)) return false;
-  const expected = await hmacHex(env.SESSION_SECRET, exp + "." + nonce);
+  const expected = await hmacHex(env.SESSION_SECRET, tokenData(env, purpose, exp, nonce));
   return timingSafeEq(sig, expected);
 }
 
+function isAuthed(request, env) {
+  return hasToken(request, env, SESSION_COOKIE, "admin");
+}
+
+/* maxAge null = cookie do zavření prohlížeče */
+function tokenCookie(name, value, maxAge) {
+  return `${name}=${value}; Path=/; HttpOnly; Secure; SameSite=Strict` + (maxAge === null ? "" : `; Max-Age=${maxAge}`);
+}
+
 function sessionCookie(value, maxAge) {
-  return `${SESSION_COOKIE}=${value}; Path=/; HttpOnly; Secure; SameSite=Strict; Max-Age=${maxAge}`;
+  return tokenCookie(SESSION_COOKIE, value, maxAge);
 }
 
 /* CSRF: mutace vyžadují vlastní hlavičku (cross-site formulář ji poslat nemůže)
@@ -438,14 +455,16 @@ async function adminLogin(request, env) {
     if (userOk && passOk) ok = true; // projít všechny, ne vyskočit
   }
   if (!ok) return err(401, "Nesprávné přihlašovací údaje.");
-  const token = await makeSession(env);
-  return json({ ok: true }, 200, { "Set-Cookie": sessionCookie(token, SESSION_HOURS * 3600) });
+  const seconds = body.remember === true ? REMEMBER_DAYS * 86400 : SESSION_HOURS * 3600;
+  const token = await makeToken(env, "admin", seconds);
+  return json({ ok: true }, 200, { "Set-Cookie": sessionCookie(token, seconds) });
 }
 
 /* ─── trezor: interní soubory, druhé heslo (VAULT_PASSWORD) na každý požadavek ─── */
 
 async function vaultDenied(request, env) {
   if (!env.VAULT_PASSWORD) return err(500, "Trezor není nakonfigurovaný (VAULT_PASSWORD).");
+  if (await hasToken(request, env, VAULT_COOKIE, "vault")) return null;
   const key = request.headers.get("X-Vault-Key") || "";
   if (!(await timingSafeEq(key, env.VAULT_PASSWORD))) return err(401, "Nesprávné heslo trezoru.");
   return null;
@@ -607,7 +626,10 @@ export default {
         if (!(await isAuthed(request, env))) return err(401, "Nepřihlášen.");
 
         if (path === "/api/admin/logout" && method === "POST") {
-          return json({ ok: true }, 200, { "Set-Cookie": sessionCookie("", 0) });
+          const h = new Headers({ "Content-Type": "application/json; charset=utf-8", ...secHeaders() });
+          h.append("Set-Cookie", sessionCookie("", 0));
+          h.append("Set-Cookie", tokenCookie(VAULT_COOKIE, "", 0));
+          return new Response(JSON.stringify({ ok: true }), { status: 200, headers: h });
         }
         if (path === "/api/admin/submissions" && method === "GET") {
           return listSubmissions(env, url);
@@ -626,7 +648,18 @@ export default {
           if (!(await rateLimit(env, "vault", clientIp(request), 5, 900))) {
             return err(429, "Příliš mnoho pokusů. Zkuste to za 15 minut.");
           }
-          return (await vaultDenied(request, env)) || json({ ok: true });
+          if (!hasCsrfHeader(request)) return err(403, "Chybí bezpečnostní hlavička.");
+          if (!env.VAULT_PASSWORD) return err(500, "Trezor není nakonfigurovaný (VAULT_PASSWORD).");
+          const key = request.headers.get("X-Vault-Key") || "";
+          if (!(await timingSafeEq(key, env.VAULT_PASSWORD))) return err(401, "Nesprávné heslo trezoru.");
+          let remember = false;
+          try { remember = (await request.json()).remember === true; } catch { /* prázdné tělo */ }
+          const seconds = remember ? REMEMBER_DAYS * 86400 : SESSION_HOURS * 3600;
+          const token = await makeToken(env, "vault", seconds);
+          return json({ ok: true }, 200, { "Set-Cookie": tokenCookie(VAULT_COOKIE, token, remember ? seconds : null) });
+        }
+        if (path === "/api/admin/vault/lock" && method === "POST") {
+          return json({ ok: true }, 200, { "Set-Cookie": tokenCookie(VAULT_COOKIE, "", 0) });
         }
         if (path.startsWith("/api/admin/vault/")) {
           const denied = await vaultDenied(request, env);

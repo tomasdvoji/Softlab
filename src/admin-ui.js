@@ -4,23 +4,29 @@
    (STORE, bez komprese) - server jen autorizovaně streamuje soubory. */
 
 const BASE_CSS = `
-  :root { --paper:#f2f0ea; --paper2:#e9e6de; --ink:#141412; --muted:#5f5e57; --line:#d8d5cc; --accent:#2431e8; }
+  :root { --paper:#eef1f7; --paper2:#fbfcff; --ink:#0f1235; --muted:#5f6480; --line:#dde1ee; --accent:#3340e0; --accent-d:#2530c0; --mint:#a9dcd3; --deep:#2b35a8; }
   * { box-sizing:border-box; margin:0; padding:0; }
-  body { background:var(--paper); color:var(--ink); font-family:"Archivo",system-ui,sans-serif; font-size:16px; line-height:1.55; -webkit-font-smoothing:antialiased; }
-  .wrap { max-width:1100px; margin-inline:auto; padding:2rem clamp(1rem,4vw,3rem) 5rem; }
-  header.bar { display:flex; align-items:center; gap:1.5rem; padding-block:1.1rem; border-bottom:1px solid var(--line); margin-bottom:2rem; }
-  .logo { font-weight:800; text-transform:uppercase; font-stretch:120%; font-size:1.1rem; letter-spacing:.01em; color:var(--ink); text-decoration:none; }
-  .logo sup { font-size:.5em; }
-  h1 { font-weight:800; text-transform:uppercase; font-stretch:115%; letter-spacing:-.01em; font-size:clamp(1.6rem,4vw,2.6rem); line-height:1; margin-bottom:1.5rem; }
-  button, .btn { font:inherit; font-weight:600; border:2px solid var(--ink); background:var(--ink); color:var(--paper); padding:.55rem 1.2rem; cursor:pointer; border-radius:0; text-decoration:none; display:inline-block; }
-  button:hover, .btn:hover { background:var(--accent); border-color:var(--accent); }
-  button.ghost { background:transparent; color:var(--ink); }
-  button.ghost:hover { background:var(--ink); color:var(--paper); }
-  button.danger { background:transparent; border-color:#b3261e; color:#b3261e; }
-  button.danger:hover { background:#b3261e; color:var(--paper); }
-  input[type=text], input[type=password], input[type=search] { font:inherit; width:100%; padding:.6rem .9rem; border:2px solid var(--ink); background:var(--paper); color:var(--ink); border-radius:0; }
-  input:focus-visible, button:focus-visible, a:focus-visible { outline:2px solid var(--accent); outline-offset:2px; }
-  .mono { font-family:"IBM Plex Mono",ui-monospace,monospace; font-size:.78rem; text-transform:uppercase; letter-spacing:.08em; }
+  html { background:var(--deep); }
+  body { background:var(--deep); color:var(--ink); font-family:"Manrope",system-ui,sans-serif; font-size:16px; line-height:1.55; -webkit-font-smoothing:antialiased; padding:12px; min-height:100vh; }
+  .wrap { max-width:1180px; margin-inline:auto; background:var(--paper); border-radius:30px; padding:1.4rem clamp(1rem,4vw,3rem) 5rem; min-height:calc(100vh - 24px); }
+  header.bar { display:flex; align-items:center; gap:1rem; flex-wrap:wrap; padding:.5rem .5rem .5rem 1.1rem; background:var(--paper2); border-radius:999px; margin-bottom:2.5rem; box-shadow:0 10px 40px rgba(15,18,53,.06); }
+  .logo { display:inline-flex; align-items:center; gap:.5rem; font-weight:600; font-size:1.15rem; letter-spacing:-.03em; color:var(--ink); text-decoration:none; }
+  .logo::before { content:""; width:28px; height:28px; border-radius:50%; background:radial-gradient(circle, var(--accent) 0 5px, var(--paper2) 6px 9px, var(--accent) 10px); }
+  .logo sup { font-size:.55em; }
+  h1 { font-weight:400; letter-spacing:-.04em; font-size:clamp(2rem,4.5vw,3.2rem); line-height:1.05; margin-bottom:1.5rem; }
+  button, .btn { font:inherit; font-weight:500; font-size:.92rem; border:0; background:var(--accent); color:#fff; height:44px; padding:0 1.3rem; cursor:pointer; border-radius:40px; text-decoration:none; display:inline-flex; align-items:center; justify-content:center; gap:.5rem; transition:background .25s,color .25s; white-space:nowrap; }
+  button:hover, .btn:hover { background:var(--accent-d); }
+  button:disabled { opacity:.6; cursor:default; }
+  button.ghost, .btn.ghost { background:var(--paper); color:var(--ink); box-shadow:inset 0 0 0 1px var(--line); }
+  button.ghost:hover, .btn.ghost:hover { background:var(--ink); color:#fff; box-shadow:none; }
+  button.danger { background:transparent; color:#b3261e; box-shadow:inset 0 0 0 1px #e6b7b3; }
+  button.danger:hover { background:#b3261e; color:#fff; }
+  input[type=text], input[type=password], input[type=search], input[type=email] { font:inherit; width:100%; height:50px; padding:0 1.1rem; border:1px solid var(--line); background:var(--paper2); color:var(--ink); border-radius:40px; }
+  input:focus { outline:none; border-color:var(--accent); }
+  button:focus-visible, a:focus-visible, input[type=checkbox]:focus-visible { outline:2px solid var(--accent); outline-offset:2px; }
+  .check { display:flex !important; align-items:center; gap:.6rem; font-weight:500 !important; font-size:.92rem; margin-top:1rem; cursor:pointer; }
+  .check input { width:18px; height:18px; accent-color:var(--accent); }
+  .mono { font-size:.8rem; letter-spacing:.02em; }
   .muted { color:var(--muted); }
   .error { color:#b3261e; margin-top:.75rem; min-height:1.4em; }
 `;
@@ -35,23 +41,25 @@ export function adminLoginHtml() {
 <title>Přihlášení · Softlab Interactive administrace</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600&display=swap" rel="stylesheet">
 <style>${BASE_CSS}
-  .login { max-width:380px; margin:14vh auto 0; }
-  .login label { display:block; margin-bottom:.5rem; font-weight:600; }
-  .login button { width:100%; margin-top:1rem; padding:.8rem; }
+  body { display:grid; place-items:center; }
+  .wrap { min-height:0; width:min(460px,100%); padding:2.4rem clamp(1.4rem,5vw,2.6rem) 2.2rem; }
+  .login label { display:block; margin-bottom:.45rem; font-weight:500; font-size:.9rem; }
+  .login button[type=submit] { width:100%; margin-top:1.4rem; height:50px; }
 </style>
 </head>
 <body>
 <div class="wrap">
   <div class="login">
-    <a class="logo" href="/">Softlab Interactive<sup>®</sup></a>
-    <h1 style="margin-top:2.5rem">Administrace<br>podkladů</h1>
+    <a class="logo" href="/">softlab<sup>™</sup></a>
+    <h1 style="margin-top:2rem">Administrace</h1>
     <form id="loginForm">
       <label for="user">Přihlašovací jméno</label>
       <input type="text" id="user" autocomplete="username" required autofocus style="margin-bottom:1rem">
       <label for="pw">Heslo</label>
       <input type="password" id="pw" autocomplete="current-password" required>
+      <label class="check"><input type="checkbox" id="remember"> Zůstat přihlášen na tomto zařízení (30 dní)</label>
       <button type="submit">Přihlásit se</button>
       <p class="error" id="loginError" role="alert"></p>
     </form>
@@ -66,7 +74,7 @@ document.getElementById('loginForm').addEventListener('submit', async function (
     var res = await fetch('/api/admin/login', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'X-Requested-With': 'fetch' },
-      body: JSON.stringify({ username: document.getElementById('user').value, password: document.getElementById('pw').value })
+      body: JSON.stringify({ username: document.getElementById('user').value, password: document.getElementById('pw').value, remember: document.getElementById('remember').checked })
     });
     var data = await res.json();
     if (res.ok) { location.reload(); }
@@ -90,36 +98,38 @@ export function adminAppHtml() {
 <title>Podklady klientů · Softlab Interactive administrace</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600&display=swap" rel="stylesheet">
 <style>${BASE_CSS}
   header.bar .spacer { margin-left:auto; }
   .search { max-width:420px; margin-bottom:1.5rem; }
   table { width:100%; border-collapse:collapse; }
   .list-row { border-top:1px solid var(--line); cursor:pointer; }
-  .list-row:hover { background:var(--paper2); }
+  .list-row:hover { background:var(--paper); }
+  table { background:var(--paper2); border-radius:22px; overflow:hidden; }
   .list-row td { padding:.85rem .6rem; vertical-align:top; }
   .list-head th { text-align:left; padding:.4rem .6rem; font-weight:600; font-size:.85rem; color:var(--muted); }
   .nowrap { white-space:nowrap; }
   .detail-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:1rem 2rem; margin-bottom:2rem; }
   .detail-grid dt { font-size:.8rem; color:var(--muted); }
   .detail-grid dd { font-weight:600; overflow-wrap:anywhere; }
-  .instructions { background:var(--paper2); border:1px solid var(--line); padding:1.25rem; white-space:pre-wrap; overflow-wrap:anywhere; margin-bottom:2rem; max-height:320px; overflow:auto; }
+  .instructions { background:var(--paper2); border:1px solid var(--line); border-radius:18px; padding:1.25rem; white-space:pre-wrap; overflow-wrap:anywhere; margin-bottom:2rem; max-height:320px; overflow:auto; }
   .file-row { border-top:1px solid var(--line); }
   .file-row td { padding:.7rem .6rem; vertical-align:middle; }
-  .thumb { width:56px; height:42px; object-fit:cover; border:1px solid var(--line); background:var(--paper2); display:block; }
+  .thumb { width:56px; height:42px; object-fit:cover; border:1px solid var(--line); border-radius:8px; background:var(--paper2); display:block; }
   .actions { display:flex; gap:.75rem; flex-wrap:wrap; margin:1.5rem 0 2rem; align-items:center; }
-  .txt-preview { background:var(--ink); color:var(--paper); font-family:ui-monospace,monospace; font-size:.8rem; padding:1rem; white-space:pre-wrap; overflow-wrap:anywhere; max-height:260px; overflow:auto; }
+  .txt-preview { background:var(--ink); color:var(--paper); border-radius:14px; font-family:ui-monospace,monospace; font-size:.8rem; padding:1rem; white-space:pre-wrap; overflow-wrap:anywhere; max-height:260px; overflow:auto; }
   .status { min-height:1.4em; margin-top:.5rem; }
-  .bar-nav { display:flex; gap:1.25rem; }
-  .bar-nav a { font-weight:600; color:var(--muted); text-decoration:none; }
-  .bar-nav a.active, .bar-nav a:hover { color:var(--ink); }
-  .vault-unlock { max-width:380px; }
-  .vault-unlock label { display:block; font-weight:600; margin-bottom:.5rem; }
+  .bar-nav { display:flex; gap:.2rem; flex-wrap:wrap; margin-left:.5rem; }
+  .bar-nav a { font-weight:500; font-size:.92rem; color:var(--ink); text-decoration:none; padding:.55rem .9rem; border-radius:999px; }
+  .bar-nav a:hover { background:var(--paper); }
+  .bar-nav a.active { background:var(--ink); color:#fff; }
+  .vault-unlock { max-width:440px; background:var(--paper2); border-radius:24px; padding:1.6rem; }
+  .vault-unlock label { display:block; font-weight:500; margin-bottom:.45rem; }
   .vault-toolbar { display:flex; gap:.75rem; flex-wrap:wrap; align-items:center; margin:1.25rem 0; }
-  .vault-editor textarea { width:100%; min-height:320px; font-family:ui-monospace,monospace; font-size:.9rem; padding:1rem; border:2px solid var(--ink); background:var(--paper); border-radius:0; }
+  .vault-editor textarea { width:100%; min-height:320px; font-family:ui-monospace,monospace; font-size:.9rem; padding:1rem; border:1px solid var(--line); background:var(--paper2); border-radius:18px; }
   .vault-editor { margin:1rem 0; }
   .invites { margin-bottom:1.5rem; }
-  .invites-panel { border:1px solid var(--line); background:var(--paper2); padding:1.25rem; margin-top:.75rem; }
+  .invites-panel { border:1px solid var(--line); background:var(--paper2); border-radius:22px; padding:1.4rem; margin-top:.75rem; }
   .invite-form { display:flex; gap:.75rem; flex-wrap:wrap; }
   .invite-form input { flex:1; min-width:200px; }
   .invite-result { margin-top:1rem; overflow-wrap:anywhere; }
@@ -132,10 +142,12 @@ export function adminAppHtml() {
 <body>
 <div class="wrap">
   <header class="bar">
-    <a class="logo" href="/">Softlab Interactive<sup>®</sup></a>
+    <a class="logo" href="/">softlab<sup>™</sup></a>
     <nav class="bar-nav" aria-label="Administrace">
       <a href="#" data-nav="podklady">Podklady</a>
       <a href="#/trezor" data-nav="trezor">Trezor</a>
+      <a href="/" target="_blank" rel="noopener">Web ↗</a>
+      <a href="/v1/" target="_blank" rel="noopener">Původní verze ↗</a>
     </nav>
     <span class="spacer"></span>
     <button class="ghost" id="logoutBtn">Odhlásit</button>
@@ -170,8 +182,8 @@ async function api(path, opts) {
   opts = opts || {};
   opts.headers = Object.assign({ 'X-Requested-With': 'fetch' }, opts.headers || {});
   var res = await fetch(path, opts);
-  if (res.status === 401) { location.reload(); throw new Error('unauthorized'); }
   var data = await res.json();
+  if (res.status === 401 && data.error === 'Nepřihlášen.') { location.reload(); throw new Error('unauthorized'); }
   if (!res.ok) throw new Error(data.error || ('Chyba ' + res.status));
   return data;
 }
@@ -184,10 +196,10 @@ document.getElementById('logoutBtn').addEventListener('click', async function ()
 /* ── klientské odkazy ── */
 function mailtoFor(inv) {
   var subject = 'Předání podkladů · Softlab Interactive';
-  var body = 'Dobrý den,\n\npro předání podkladů k vaší zakázce prosím použijte tento odkaz:\n'
-    + inv.url + '\n\nPřihlašovací jméno: ' + inv.clientName
-    + (inv.password ? '\nHeslo: ' + inv.password : '')
-    + '\n\nDěkujeme,\nSoftlab Interactive';
+  var body = 'Dobrý den,\\n\\npro předání podkladů k vaší zakázce prosím použijte tento odkaz:\\n'
+    + inv.url + '\\n\\nPřihlašovací jméno: ' + inv.clientName
+    + (inv.password ? '\\nHeslo: ' + inv.password : '')
+    + '\\n\\nDěkujeme,\\nSoftlab Interactive';
   return 'mailto:' + encodeURIComponent(inv.email || '') + '?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(body);
 }
 
@@ -223,7 +235,7 @@ function invitesPanel() {
       var copyBtn = el('button', { class:'ghost', text:'Zkopírovat odkaz', onclick: function () {
         navigator.clipboard.writeText(inv.url); copyBtn.textContent = 'Zkopírováno'; } });
       var copyAllBtn = el('button', { class:'ghost', text:'Zkopírovat údaje', onclick: function () {
-        navigator.clipboard.writeText('Odkaz: ' + inv.url + '\nJméno: ' + inv.clientName + '\nHeslo: ' + inv.password);
+        navigator.clipboard.writeText('Odkaz: ' + inv.url + '\\nJméno: ' + inv.clientName + '\\nHeslo: ' + inv.password);
         copyAllBtn.textContent = 'Zkopírováno'; } });
       result.appendChild(el('p', {}, [ el('strong', { text: inv.clientName }),
         el('span', { class:'muted', text: inv.email ? ' · ' + inv.email : '' }) ]));
@@ -482,36 +494,48 @@ async function downloadAll(sub, files, status, btn) {
   btn.disabled = false;
 }
 
-/* ── trezor ── */
-var vaultKey = null; // jen v paměti, s hlavičkou u každého požadavku
+/* ── trezor ──
+   Heslo se posílá jen jednou při odemčení; server pak nastaví HttpOnly cookie
+   (do zavření prohlížeče, nebo 30 dní se "Zůstat přihlášen"). */
+var vaultOpen = null; // null = zatím nevíme, zjistí se dotazem na seznam
 
-function vaultApi(path, opts) {
-  opts = opts || {};
-  opts.headers = Object.assign({ 'X-Vault-Key': vaultKey }, opts.headers || {});
-  return api(path, opts);
-}
+function vaultApi(path, opts) { return api(path, opts); }
 
 async function renderVault() {
   app.textContent = '';
   app.appendChild(el('h1', { text: 'Trezor' }));
 
-  if (!vaultKey) {
+  if (vaultOpen === null) {
+    try { await vaultApi('/api/admin/vault/files'); vaultOpen = true; }
+    catch (e) { vaultOpen = false; }
+    return renderVault();
+  }
+
+  if (!vaultOpen) {
     var form = el('form', { class: 'vault-unlock' });
     var label = el('label', { for: 'vk', text: 'Heslo trezoru' });
     var input = el('input', { type: 'password', id: 'vk', autocomplete: 'off', required: '' });
-    var btn = el('button', { text: 'Odemknout', style: 'margin-top:1rem;width:100%' });
+    var remember = el('input', { type: 'checkbox', id: 'vremember' });
+    var rememberLabel = el('label', { class: 'check', for: 'vremember' },
+      [ remember, document.createTextNode(' Zůstat přihlášen na tomto zařízení (30 dní)') ]);
+    var btn = el('button', { text: 'Odemknout', style: 'margin-top:1.2rem;width:100%' });
     var errP = el('p', { class: 'error', role: 'alert' });
-    form.appendChild(label); form.appendChild(input); form.appendChild(btn); form.appendChild(errP);
+    [label, input, rememberLabel, btn, errP].forEach(function (n) { form.appendChild(n); });
     form.addEventListener('submit', async function (e) {
       e.preventDefault();
       errP.textContent = '';
+      btn.disabled = true;
       try {
-        vaultKey = input.value;
-        await vaultApi('/api/admin/vault/unlock', { method: 'POST' });
+        await api('/api/admin/vault/unlock', {
+          method: 'POST',
+          headers: { 'X-Vault-Key': input.value, 'Content-Type': 'application/json' },
+          body: JSON.stringify({ remember: remember.checked })
+        });
+        vaultOpen = true;
         renderVault();
-      } catch (e2) { vaultKey = null; errP.textContent = e2.message; }
+      } catch (e2) { errP.textContent = e2.message; btn.disabled = false; }
     });
-    app.appendChild(el('p', { class: 'muted', text: 'Interní soubory jen pro Softlab Interactive. Vyžadují druhé heslo.' }));
+    app.appendChild(el('p', { class: 'muted', text: 'Interní soubory jen pro Softlab Interactive. Vyžadují druhé heslo.', style: 'margin-bottom:1.2rem' }));
     app.appendChild(form);
     input.focus();
     return;
@@ -544,12 +568,15 @@ async function renderVault() {
       openEditor(name);
     } catch (e) { status.textContent = e.message; }
   } });
-  var lockBtn = el('button', { class: 'ghost', text: 'Zamknout', onclick: function () { vaultKey = null; renderVault(); } });
+  var lockBtn = el('button', { class: 'ghost', text: 'Zamknout', onclick: async function () {
+    try { await api('/api/admin/vault/lock', { method: 'POST' }); } catch (_) {}
+    vaultOpen = false; renderVault();
+  } });
 
   async function openEditor(name) {
     editorWrap.textContent = '';
     var res = await fetch('/api/admin/vault/files/' + encodeURIComponent(name) + '?text=1',
-      { headers: { 'X-Vault-Key': vaultKey, 'X-Requested-With': 'fetch' } });
+      { headers: { 'X-Requested-With': 'fetch' } });
     if (!res.ok) { status.textContent = 'Soubor se nepodařilo načíst.'; return; }
     var ta = el('textarea', { spellcheck: 'false' });
     ta.value = await res.text();
@@ -571,7 +598,7 @@ async function renderVault() {
 
   async function downloadFile(name) {
     var res = await fetch('/api/admin/vault/files/' + encodeURIComponent(name),
-      { headers: { 'X-Vault-Key': vaultKey, 'X-Requested-With': 'fetch' } });
+      { headers: { 'X-Requested-With': 'fetch' } });
     if (!res.ok) { status.textContent = 'Stažení se nezdařilo.'; return; }
     var a = document.createElement('a');
     a.href = URL.createObjectURL(await res.blob());
@@ -602,7 +629,7 @@ async function renderVault() {
         listWrap.appendChild(row);
       });
     } catch (e) {
-      if (e.message === 'Nesprávné heslo trezoru.') { vaultKey = null; renderVault(); return; }
+      if (e.message === 'Nesprávné heslo trezoru.') { vaultOpen = false; renderVault(); return; }
       status.textContent = e.message;
     }
   }
