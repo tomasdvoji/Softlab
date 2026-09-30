@@ -216,7 +216,11 @@
     /* ── úvodní odhalení po dlaždicích ── */
 
     .rv { opacity: 0; transform: translateY(36px); }
-    .hero .rv { opacity: 1; transform: none; }
+    .hero .rv { opacity: 1; transform: none; filter: none; transition: opacity .55s ease-out, filter .7s ease-out, transform .8s cubic-bezier(.2,.7,.2,1); }
+    html.intro-run .hero .rv { opacity: 0; filter: blur(14px); transform: translateY(16px); transition: none; }
+    .hero .hero-sub { transition-delay: .12s; }
+    .hero .hero-ctas { transition-delay: .24s; }
+    .hero .hero-bottom { transition-delay: .38s; }
     @media (prefers-reduced-motion: reduce) { .rv { opacity: 1; transform: none; } .statement .w, .step { opacity: 1; } }
 
     @media (max-width: 900px) {
@@ -234,7 +238,7 @@
       .cookie { right: 14px; bottom: 14px; width: calc(100% - 28px); }
     }
   </style>
-  <script>if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches) document.documentElement.classList.add("intro-wait");</script>
+  <script>if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches) document.documentElement.classList.add("intro-wait", "intro-run");</script>
   <style>html.intro-wait body { clip-path: inset(0 100% 100% 0); }</style>
 </head>
 <body>
@@ -262,10 +266,11 @@
     }
     body.style.clipPath = poly(0);
     root.classList.remove("intro-wait");
-    function done() { body.style.clipPath = ""; }
+    function done() { body.style.clipPath = ""; root.classList.remove("intro-run"); }
     function frame(now) {
       if (t0 === null) t0 = now;
       var t = Math.min(1, Math.max(0, (now - t0 - delay) / dur));
+      if (t > 0.8) root.classList.remove("intro-run");
       if (t < 1) { body.style.clipPath = poly(ease(t) * end); requestAnimationFrame(frame); } else done();
     }
     var started = false;
