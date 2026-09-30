@@ -210,6 +210,11 @@
     .cookie a { color: var(--green-d); text-decoration: underline; }
     .cookie .btn { height: 42px; justify-content: center; }
 
+    /* ── úvodní odhalení po dlaždicích ── */
+    .intro { position: fixed; inset: 0; z-index: 100; display: grid; pointer-events: none; }
+    .intro i { background: var(--deep); box-shadow: 0 0 0 1px var(--deep); animation: tileOut 1ms steps(1) forwards; }
+    @keyframes tileOut { to { visibility: hidden; } }
+
     .rv { opacity: 0; transform: translateY(36px); }
     @media (prefers-reduced-motion: reduce) { .rv { opacity: 1; transform: none; } .statement .w, .step { opacity: 1; } }
 
@@ -230,6 +235,28 @@
   </style>
 </head>
 <body>
+  <script>
+  (function () {
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    var cols = window.innerWidth < 700 ? 6 : 12;
+    var size = window.innerWidth / cols;
+    var rows = Math.ceil(window.innerHeight / size);
+    var el = document.createElement("div");
+    el.className = "intro";
+    el.setAttribute("aria-hidden", "true");
+    el.style.gridTemplateColumns = "repeat(" + cols + ", 1fr)";
+    el.style.gridAutoRows = size + "px";
+    var steps = cols + rows - 2, total = 1100, html = "";
+    for (var r = 0; r < rows; r++) for (var c = 0; c < cols; c++) {
+      /* diagonal staircase from the top-left corner, tiny jitter so the edge stays blocky */
+      var d = 250 + ((c + r) / steps) * total + ((c * 7 + r * 13) % 3) * 25;
+      html += '<i style="animation-delay:' + Math.round(d) + 'ms"></i>';
+    }
+    el.innerHTML = html;
+    document.body.appendChild(el);
+    setTimeout(function () { el.remove(); }, 250 + total + 200);
+  })();
+  </script>
   <header class="nav" id="nav">
     <a class="logo" href="#top" aria-label="Softlab Interactive, úvod"><span class="logo-mark" aria-hidden="true"></span>softlab<sup>™</sup></a>
     <nav class="nav-links" aria-label="Hlavní navigace">
