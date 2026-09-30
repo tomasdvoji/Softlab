@@ -76,7 +76,7 @@
 
     /* ── hero s rozmazaným květem ── */
     .hero { position: relative; min-height: calc(100vh - 24px); min-height: calc(100svh - 24px); border-radius: var(--r); overflow: hidden; color: var(--white); display: flex; flex-direction: column; justify-content: flex-end; padding: 140px clamp(1.5rem, 4vw, 3.5rem) clamp(1.5rem, 3vw, 2.5rem); isolation: isolate; background: linear-gradient(100deg, #bfe6dc 0%, #8fb8e6 35%, #2a2fb8 60%, #1b1f86 100%); }
-    .fluted { position: absolute; inset: 0; width: 100%; height: 100%; z-index: -1; display: block; }
+    .fluted { position: absolute; inset: 0; width: 100%; height: 100%; z-index: -1; display: block; opacity: 0; }
     .bloom { position: absolute; inset: -10%; z-index: -1; filter: blur(46px) saturate(1.15); }
     .bloom i { position: absolute; border-radius: 50%; }
     .bloom .b1 { width: 48vw; height: 36vw; left: 42%; top: 12%; background: radial-gradient(closest-side, #2a35d8, rgba(42,53,216,0)); transform: rotate(-24deg); }
@@ -214,7 +214,6 @@
     .cookie .btn { height: 42px; justify-content: center; }
 
     /* ── úvodní odhalení po dlaždicích ── */
-    .intro { position: fixed; inset: 0; z-index: 100; width: 100%; height: 100%; pointer-events: none; }
 
     .rv { opacity: 0; transform: translateY(36px); }
     .hero .rv { opacity: 1; transform: none; }
@@ -236,45 +235,44 @@
     }
   </style>
   <script>if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches) document.documentElement.classList.add("intro-wait");</script>
-  <style>html.intro-wait .page, html.intro-wait .nav, html.intro-wait .cookie { visibility: hidden; }</style>
+  <style>html.intro-wait body { clip-path: inset(0 100% 100% 0); }</style>
 </head>
 <body>
   <script>
   (function () {
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    /* Black staircase veil sliding off along the diagonal.
-       Steps are 1/6 of the width and 1/6 of the height. A point is revealed when
-       x < sw * ceil((p - y) / sh): bottom edges glide down smoothly, rows grow right one step at a time. */
-    var W = document.documentElement.clientWidth, H = window.innerHeight;
-    var c = document.createElement("canvas");
-    c.className = "intro"; c.width = W; c.height = H; c.setAttribute("aria-hidden", "true");
-    document.body.appendChild(c);
-    var ctx = c.getContext("2d");
+    var root = document.documentElement;
+    if (!root.classList.contains("intro-wait")) return;
+    /* The page itself arrives through a staircase mask (no overlay).
+       Steps are 1/6 of the viewport width and height. Row k (counted up from the moving front)
+       is revealed k steps wide: bottom edges glide down, rows grow right one step at a time. */
+    var body = document.body;
+    var W = root.clientWidth, H = window.innerHeight;
     var sw = W / 6, sh = H / 6, end = H + 6 * sh, delay = 60, dur = 700, t0 = null;
     function ease(t) { return t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2; }
-    function draw(p) {
-      ctx.fillStyle = "#2b35a8";
-      ctx.fillRect(0, 0, W, H);
-      for (var k = 1; k <= 7; k++) {
-        var yTop = Math.max(0, p - k * sh), yBot = Math.min(H, p - (k - 1) * sh);
-        if (yBot > yTop) ctx.clearRect(0, yTop, Math.min(W, k * sw), yBot - yTop);
+    function poly(p) {
+      var y0 = window.scrollY, K = Math.max(1, Math.ceil(p / sh)), pts = ["0px " + y0 + "px"];
+      pts.push(K * sw + "px " + y0 + "px");
+      for (var k = K; k >= 1; k--) {
+        var y = y0 + Math.max(0, p - (k - 1) * sh);
+        pts.push(k * sw + "px " + y + "px");
+        pts.push((k - 1) * sw + "px " + y + "px");
       }
+      pts.push("0px " + (y0 + p) + "px");
+      return "polygon(" + pts.join(",") + ")";
     }
-    draw(0);
-    document.documentElement.classList.remove("intro-wait");
+    body.style.clipPath = poly(0);
+    root.classList.remove("intro-wait");
+    function done() { body.style.clipPath = ""; }
     function frame(now) {
       if (t0 === null) t0 = now;
       var t = Math.min(1, Math.max(0, (now - t0 - delay) / dur));
-      draw(ease(t) * end);
-      if (t < 1) requestAnimationFrame(frame); else c.remove();
+      if (t < 1) { body.style.clipPath = poly(ease(t) * end); requestAnimationFrame(frame); } else done();
     }
     var started = false;
     function go() { if (!started) { started = true; requestAnimationFrame(frame); } }
     if (document.fonts && document.fonts.ready) document.fonts.ready.then(go);
     setTimeout(go, 500);
-    setTimeout(function () { document.documentElement.classList.remove("intro-wait"); }, 3000);
-    setTimeout(function () { c.remove(); }, 500 + delay + dur + 1500);
-    window.__introEnd = (delay + dur) / 1000;
+    setTimeout(done, 3000);
   })();
   </script>
   <header class="nav" id="nav">

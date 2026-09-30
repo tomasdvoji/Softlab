@@ -111,6 +111,7 @@
   var visible = true, start = performance.now(), raf = 0, lastT = 0;
   function draw(t) {
     lastT = t;
+    canvas.style.opacity = 1;
     gl.uniform1f(uTime, t);
     gl.uniform2f(uMouse, mouse.x * 1.6, mouse.y * 1.6);
     gl.drawArrays(gl.TRIANGLES, 0, 3);
