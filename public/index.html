@@ -214,19 +214,6 @@
 
     /* ── úvodní odhalení po dlaždicích ── */
 
-
-    /* ── efekty podle reactbits.dev ── */
-    /* Spotlight Card: světlo za myší */
-    .svc-card { background: radial-gradient(520px circle at var(--mx, -999px) var(--my, -999px), rgba(51,64,224,.11), transparent 45%), var(--white); }
-    /* Glare Hover: odlesk přes náhled projektu */
-    .case-img::after { content: ""; position: absolute; inset: 0; pointer-events: none; background: linear-gradient(-45deg, transparent 58%, rgba(255,255,255,.42) 68%, transparent 78%) no-repeat; background-size: 260% 260%; background-position: -100% -100%; transition: background-position .9s cubic-bezier(.2,.7,.2,1); }
-    .case:hover .case-img::after { background-position: 100% 100%; }
-    /* Scroll Float: písmena nadpisů */
-    [data-float] .fw { display: inline-block; white-space: nowrap; }
-    [data-float] .fc { display: inline-block; will-change: transform, opacity; }
-    /* Magnet */
-    [data-magnet] { transition: background .3s, color .3s, transform .35s cubic-bezier(.2,.7,.2,1); }
-
     .rv { opacity: 0; transform: translateY(36px); }
     .hero .rv { opacity: 1; transform: none; filter: none; transition: opacity .45s ease-out, filter .58s ease-out, transform .65s cubic-bezier(.2,.7,.2,1); }
     html.intro-run .hero .rv { opacity: 0; filter: blur(14px); transform: translateY(16px); transition: none; }
@@ -302,7 +289,7 @@
       <a href="/admin/files">Přihlášení</a>
     </nav>
     <div class="nav-right">
-      <a class="btn btn-dark" data-magnet href="#poptavka">Poptat projekt <span class="arr" aria-hidden="true">→</span></a>
+      <a class="btn btn-dark" href="#poptavka">Poptat projekt <span class="arr" aria-hidden="true">→</span></a>
       <button class="burger" id="burger" aria-label="Otevřít menu" aria-expanded="false" aria-controls="mnav"><span></span><span></span></button>
     </div>
   </header>
@@ -322,7 +309,7 @@
       <h1 class="rv">Weby &amp; interní systémy na míru.</h1>
       <p class="hero-sub rv">Jsme Softlab Interactive. Firmám stavíme rychlé weby a software, který kopíruje jejich procesy, ne naopak.</p>
       <div class="hero-ctas rv">
-        <a class="btn btn-green" data-magnet href="#poptavka">Poptat projekt <span class="arr" aria-hidden="true">→</span></a>
+        <a class="btn btn-green" href="#poptavka">Poptat projekt <span class="arr" aria-hidden="true">→</span></a>
       </div>
       <div class="hero-bottom rv">
         <span></span>
@@ -344,7 +331,7 @@
       <div class="wrap">
         <div class="head rv">
           <span class="eyebrow">Služby</span>
-          <h2 data-float>Co stavíme</h2>
+          <h2>Co stavíme</h2>
         </div>
         <div class="svc-list">
           <article class="svc-card">
@@ -419,7 +406,7 @@
       <div class="wrap">
         <div class="head rv">
           <span class="eyebrow">Postup</span>
-          <h2 data-float>Jak pracujeme</h2>
+          <h2>Jak pracujeme</h2>
           <p>Čtyři kroky od první schůzky k běžícímu provozu.</p>
         </div>
         <ol class="steps">
@@ -436,7 +423,7 @@
       <div class="wrap">
         <div class="head rv">
           <span class="eyebrow">Projekty</span>
-          <h2 data-float>Vybrané projekty</h2>
+          <h2>Vybrané projekty</h2>
           <p>Každý web má svůj vlastní charakter. Prohlédněte si je naživo.</p>
         </div>
         <div class="cases">
@@ -478,9 +465,9 @@
 
     <!-- CTA -->
     <section class="cta">
-      <h2 data-float>Máte projekt?</h2>
+      <h2 class="rv">Máte projekt?</h2>
       <div class="cta-btns rv" style="margin-top:2rem">
-        <a class="btn btn-white" data-magnet href="#poptavka">Poptat projekt <span class="arr" aria-hidden="true">→</span></a>
+        <a class="btn btn-white" href="#poptavka">Poptat projekt <span class="arr" aria-hidden="true">→</span></a>
       </div>
     </section>
 
@@ -490,7 +477,7 @@
         <div class="foot-grid">
           <div class="rv">
             <span class="eyebrow">Kontakt</span>
-            <h2 data-float style="margin-top:1.2rem">Pojďme ho postavit.</h2>
+            <h2 style="margin-top:1.2rem">Pojďme ho postavit.</h2>
             <p class="foot-sub">Napište nám dvě věty o tom, co potřebujete. Ozveme se do 24 hodin.</p>
             <a class="contact-line" href="mailto:studio@softlab.cz?subject=Popt%C3%A1vka%20projektu"><b aria-hidden="true">@</b>studio@softlab.cz</a>
             <a class="contact-line" href="tel:+420728521533"><b aria-hidden="true">☏</b>+420 728 521 533</a>
@@ -569,41 +556,6 @@
 
     if (reduce || !window.gsap) return;
     gsap.registerPlugin(ScrollTrigger);
-
-    /* Scroll Float (reactbits): písmena vyplouvají zespodu, ze sploštění do normálu */
-    gsap.utils.toArray("[data-float]").forEach(function (h) {
-      h.setAttribute("aria-label", h.textContent);
-      h.innerHTML = h.textContent.split(" ").map(function (w) {
-        return '<span class="fw" aria-hidden="true">' + w.split("").map(function (c) { return '<span class="fc">' + c + "</span>"; }).join("") + "</span>";
-      }).join(" ");
-      gsap.fromTo(h.querySelectorAll(".fc"),
-        { opacity: 0, yPercent: 120, scaleY: 2.3, scaleX: 0.7, transformOrigin: "50% 0%" },
-        { opacity: 1, yPercent: 0, scaleY: 1, scaleX: 1, stagger: 0.03, ease: "back.inOut(2)",
-          scrollTrigger: { trigger: h, start: "top bottom-=5%", end: "bottom center+=10%", scrub: true } });
-    });
-
-    if (window.matchMedia("(pointer: fine)").matches) {
-      /* Spotlight Card */
-      document.querySelectorAll(".svc-card").forEach(function (c) {
-        c.addEventListener("pointermove", function (e) {
-          var r = c.getBoundingClientRect();
-          c.style.setProperty("--mx", (e.clientX - r.left) + "px");
-          c.style.setProperty("--my", (e.clientY - r.top) + "px");
-        });
-        c.addEventListener("pointerleave", function () { c.style.removeProperty("--mx"); c.style.removeProperty("--my"); });
-      });
-      /* Magnet: tlačítko se v okruhu 70 px přitahuje ke kurzoru */
-      var mags = document.querySelectorAll("[data-magnet]"), px = -1e4, py = -1e4, queued = false;
-      function magnet() {
-        queued = false;
-        mags.forEach(function (b) {
-          var r = b.getBoundingClientRect(), pad = 70;
-          var inside = px > r.left - pad && px < r.right + pad && py > r.top - pad && py < r.bottom + pad;
-          b.style.transform = inside ? "translate(" + ((px - (r.left + r.width / 2)) / 4).toFixed(1) + "px," + ((py - (r.top + r.height / 2)) / 4).toFixed(1) + "px)" : "";
-        });
-      }
-      addEventListener("pointermove", function (e) { px = e.clientX; py = e.clientY; if (!queued) { queued = true; requestAnimationFrame(magnet); } }, { passive: true });
-    }
     if (isTouch) ScrollTrigger.config({ ignoreMobileResize: true });
 
     if (!isTouch && window.Lenis) {
