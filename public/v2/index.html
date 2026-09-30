@@ -216,11 +216,11 @@
     /* ── úvodní odhalení po dlaždicích ── */
 
     .rv { opacity: 0; transform: translateY(36px); }
-    .hero .rv { opacity: 1; transform: none; filter: none; transition: opacity .55s ease-out, filter .7s ease-out, transform .8s cubic-bezier(.2,.7,.2,1); }
+    .hero .rv { opacity: 1; transform: none; filter: none; transition: opacity .35s ease-out, filter .45s ease-out, transform .5s cubic-bezier(.2,.7,.2,1); }
     html.intro-run .hero .rv { opacity: 0; filter: blur(14px); transform: translateY(16px); transition: none; }
-    .hero .hero-sub { transition-delay: .12s; }
-    .hero .hero-ctas { transition-delay: .24s; }
-    .hero .hero-bottom { transition-delay: .38s; }
+    .hero .hero-sub { transition-delay: .07s; }
+    .hero .hero-ctas { transition-delay: .14s; }
+    .hero .hero-bottom { transition-delay: .22s; }
     @media (prefers-reduced-motion: reduce) { .rv { opacity: 1; transform: none; } .statement .w, .step { opacity: 1; } }
 
     @media (max-width: 900px) {
