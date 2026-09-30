@@ -214,6 +214,7 @@
     .intro { position: fixed; inset: 0; z-index: 100; width: 100%; height: 100%; pointer-events: none; }
 
     .rv { opacity: 0; transform: translateY(36px); }
+    .hero .rv { opacity: 1; transform: none; }
     @media (prefers-reduced-motion: reduce) { .rv { opacity: 1; transform: none; } .statement .w, .step { opacity: 1; } }
 
     @media (max-width: 900px) {
@@ -261,8 +262,11 @@
       draw(ease(t) * end);
       if (t < 1) requestAnimationFrame(frame); else c.remove();
     }
-    requestAnimationFrame(frame);
-    setTimeout(function () { c.remove(); }, delay + dur + 1500);
+    var started = false;
+    function go() { if (!started) { started = true; requestAnimationFrame(frame); } }
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(go);
+    setTimeout(go, 500);
+    setTimeout(function () { c.remove(); }, 500 + delay + dur + 1500);
     window.__introEnd = (delay + dur) / 1000;
   })();
   </script>
@@ -550,12 +554,10 @@
     }
 
     /* intro */
-    gsap.from(".nav", { y: -90, opacity: 0, duration: 1.1, ease: "expo.out", delay: (window.__introEnd || 0) + 0.1 });
 
-    var introEnd = window.__introEnd || 0, heroI = 0;
     gsap.utils.toArray(".rv").forEach(function (el) {
-      var d = el.closest(".hero") ? introEnd - 0.15 + 0.08 * heroI++ : 0;
-      gsap.to(el, { opacity: 1, y: 0, duration: 1.1, delay: d, ease: "power3.out", scrollTrigger: { trigger: el, start: "top 92%", once: true } });
+      if (el.closest(".hero")) return;
+      gsap.to(el, { opacity: 1, y: 0, duration: 1.1, ease: "power3.out", scrollTrigger: { trigger: el, start: "top 92%", once: true } });
     });
 
     /* logo pás */
