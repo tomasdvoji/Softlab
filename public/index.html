@@ -583,7 +583,7 @@
     var cards = gsap.utils.toArray(".svc-card");
     cards.forEach(function (c, i) {
       if (i === cards.length - 1) return;
-      gsap.to(c, { scale: 0.94, opacity: 0.55, ease: "none", scrollTrigger: { trigger: cards[i + 1], start: "top 85%", end: "top 180px", scrub: true } });
+      gsap.to(c, { scale: 0.94, ease: "none", scrollTrigger: { trigger: cards[i + 1], start: "top 85%", end: "top 180px", scrub: true } });
     });
 
     /* postup: kroky se rozsvěcují */
